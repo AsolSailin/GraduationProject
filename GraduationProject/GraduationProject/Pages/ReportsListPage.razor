@@ -1,0 +1,192 @@
+﻿@page "/report_list"
+@using GraduationProject.DataBase
+@using System.Globalization
+@using GraduationProject.Services
+@inject CurrentElementService CurrentElement
+@inject GraduationProjectContext Context
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>СПИСОК ОТЧЕТОВ</PageTitle>
+
+<style>
+    .paper {
+        position: absolute;
+        left: 180px;
+        top: 100px;
+        width: 1000px;
+        height: 550px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #EEFFF7;
+        border-radius: 30px;
+    }
+
+    .mainLabelText {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: 7px;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-left: 50px;
+        margin-top: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+</style>
+
+@if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Администратор")
+{
+    <MudPaper Class="paper">
+        <MudText Class="mainLabelText">Список отчетов</MudText>
+        <div class="mainBlock">
+            <div class="tableBlock" style="overflow: scroll; height: 379px; width: 700px; margin-left: auto; margin-right: auto;">
+                @if (reportsList.Count == 0)
+                {
+                    <MudText Style="margin-left: auto; margin-right: auto; font-size: 30px; text-align: center; margin-top: 150px;">На эту дату пока нет отчетов</MudText>
+                }
+                else
+                {
+                    <MudTable Items="@reportsList" T="Report" Hover="true" @bind-SelectedItem="selectedItem" OnRowClick="@GetReport" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
+                        <RowTemplate>
+                            <MudTd DataLabel="Title" Style="font-size: 20px; margin-right: 0px">Отчет № @context.Id за @context.Date.ToString("d")</MudTd>
+                            <MudTd DataLabel="Title" Style="font-size: 20px;">@GetFullName(context)</MudTd>
+                            @if (context.IsAccepted)
+                            {
+                                <MudTd DataLabel="Title" Style="font-size: 20px;">Принят</MudTd>
+                            }
+                            else
+                            {
+                                <MudTd DataLabel="Title" Style="font-size: 20px;">-----</MudTd>
+                            }
+                        </RowTemplate>
+                    </MudTable>
+                }
+            </div>
+        </div>
+    </MudPaper>
+}
+else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Дрессировщик")
+{
+    <MudPaper Class="paper">
+        <MudText Class="mainLabelText">Мои отчеты</MudText>
+        <div>
+            <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F; width: 25%; margin-top: 30px;" Class="d-flex mx-auto">Оформить отчет</MudButton>
+        </div>
+        <div class="mainBlock">
+            <div class="tableBlock" style="overflow: scroll; height: 379px; width: 700px; margin-left: auto; margin-right: auto;">
+                <MudTable Items="@wReportsList" T="Report" Hover="true" @bind-SelectedItem="selectedItem" OnRowClick="@GetReport" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
+                    <RowTemplate>
+                        <MudTd DataLabel="Title" Style="font-size: 20px; margin-right: 0px">Отчет № @context.Id за @context.Date.ToString("d")</MudTd>
+                        @if (context.IsAccepted)
+                        {
+                            <MudTd DataLabel="Title" Style="font-size: 20px;">Принят</MudTd>
+                        }
+                        else
+                        {
+                            <MudTd DataLabel="Title" Style="font-size: 20px;">-----</MudTd>
+                        }
+                    </RowTemplate>
+                </MudTable>
+            </div>
+        </div>
+    </MudPaper>
+}
+
+
+
+@code {
+    DateTime? date = DateTime.Today;
+    string dateFormat = "dd.MM.yyyy";
+
+    private List<Report> reportsList = new List<Report>();
+    private List<Report> wReportsList = new List<Report>();
+    private List<Role> roles = new List<Role>();
+    private List<User> users = new List<User>();
+
+    private static readonly Role _allRoles = new Role() { Title = "Все" };
+
+    private Report selectedItem = new Report();
+    private User currentUser = new User();
+    private Role currentRole = new Role();
+
+    private string selectRole = "Все";
+
+    protected override void OnInitialized()
+    {
+        roles = Context.Roles.ToList();
+        GetReportList();
+    }
+
+    private void GetReport() => Navigation.NavigateTo($"/report_page/{selectedItem.Id}");
+
+    private void GetReportRegistration() => Navigation.NavigateTo($"/report_registration");
+
+    private void GetReportList()
+    {
+        @if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Администратор")
+        {
+            reportsList = Context.Reports.Where(x => x.Date == date).ToList();
+        }
+        else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Кладовщик")
+        {
+            wReportsList = Context.Reports.Where(x => x.UserId == CurrentElement.CurrentUser.Id).ToList();
+        }
+    }
+
+    private void DatePickerTextChanged(string value)
+    {
+        if (value == null || value.Length < 6)
+        {
+            date = null;
+        }
+        else
+        {
+            string[] formats = { "ddMMyy", "dd.MM.yyyy", "dd.M.yyyy", "d.MM.yyyy", "d.M.yyyy", "dd.MM.yy", "dd.M.yy", "d.MM.yy", "d.M.yy" };
+
+            if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime validDate)) date = validDate;
+            else date = null;
+        }
+
+        GetReportList();
+    }
+
+    //private void GetRole(string selected)
+    //{
+    //    selectRole = selected;
+
+    //    if (selectRole == "Все")
+    //    {
+    //        reportsList = Context.Reports.Where(x => x.Date == date).ToList();
+    //        return;
+    //    }
+
+    //    var roleId = Context.Roles.FirstOrDefault(x => x.Title == selectRole).Id;
+    //    reportsList = Context.Reports.Where(x => x.Date == date && x.User.RoleId == roleId).ToList();
+    //}
+
+    private string GetFullName(Report context)
+    {
+        currentUser = Context.Users.FirstOrDefault(x => x.Id == context.UserId);
+        currentRole = Context.Roles.FirstOrDefault(x => x.Id == currentUser.RoleId);
+
+        return $"{currentRole.Title}: {currentUser.Surname} {currentUser.Name} {currentUser.Patronymic}";
+    }
+}

@@ -1,0 +1,116 @@
+﻿@page "/aviary_page/{currentAviaryId}"
+@using GraduationProject.DataBase
+@inject GraduationProjectContext Context
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>СТРАНИЦА ВОЛЬЕРА</PageTitle>
+
+<style>
+    .paper {
+        position: absolute;
+        left: 180px;
+        top: 100px;
+        width: 1000px;
+        height: 550px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #EEFFF7;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-right: 90px;
+        margin-bottom: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: 7px;
+    }
+
+    .fieldsBlock {
+        flex: 50%;
+        margin-bottom: 30px;
+        margin-left: 50px;
+    }
+
+    .listBlock {
+        flex: 50%;
+        text-align: center;
+        margin-left: 50px;
+        width: 400px;
+        height: 400px;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-left: 50px;
+        margin-top: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+</style>
+
+<MudPaper Class="paper">
+    <div>
+        <MudText Class="mainLabel">@currentAviary.Title</MudText>
+    </div>
+    <div class="mainBlock">
+        <div class="fieldsBlock">
+            <div>
+                <MudText Class="labelText">Вид вольера</MudText>
+                <input @bind-value="type" readonly="true" />
+            </div>
+            <div>
+                <MudText Class="labelText">Вид животных</MudText>
+                <input @bind-value="kind" readonly="true" />
+            </div>
+        </div>
+        <div class="tableBlock">
+            <MudText Class="labelText">Список животных в вольере:</MudText>
+            <MudTable T="Animal" Items="@animalsList" @bind-SelectedItem="selectedItem" OnRowClick="@OnRowClick" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; overflow: scroll; height: 317px">
+                <RowTemplate>
+                    <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Name</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? currentAviaryId { get; set; }
+
+    private List<Animal> animalsList = new List<Animal>();
+
+    private Aviary currentAviary = new Aviary();
+    private Animal selectedItem = new Animal();
+
+    private bool _selectOnRowClick = true;
+
+    private string type = "";
+    private string kind = "";
+
+    protected override void OnInitialized()
+    {
+        currentAviary = Context.Aviaries.FirstOrDefault(x => x.Id == int.Parse(currentAviaryId));
+        animalsList = Context.Animals.Where(x => x.AviaryId == int.Parse(currentAviaryId) && x.IsDeleted == false).ToList();
+        type = Context.TypeAviaries.FirstOrDefault(x => x.Id == currentAviary.TypeId).Title;
+        kind = Context.AnimalKinds.FirstOrDefault(x => x.Id == currentAviary.KindId).Title;
+    }
+
+    public async Task OnRowClick(TableRowClickEventArgs<Animal> args) => Navigation.NavigateTo($"/animal_page/{selectedItem.Id}");
+}
+

@@ -1,7 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using MudBlazor.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
+using MudBlazor.Services;
+using GraduationProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMudServices();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddSingleton<CurrentElementService>();
+builder.Services.AddSingleton<FileSystemService>();
 
+builder.Services.AddDbContext<GraduationProject.DataBase.GraduationProjectContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

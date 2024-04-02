@@ -1,0 +1,103 @@
+﻿@page "/materials_list"
+@using GraduationProject.DataBase
+@inject GraduationProjectContext Context
+@inject NavigationManager Navigation
+
+<style>
+    .mainLabel {
+        text-align: center;
+        margin-right: 90px;
+        margin-bottom: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-left: 7px;
+        text-align: center;
+    }
+
+    .imgBlock {
+        flex: 50%;
+        text-align: center;
+        margin-left: 100px;
+        width: 400px;
+        height: 400px;
+    }
+</style>
+
+<div style="position: absolute; left: 190px; width: 1000px;display: flex; flex-direction: row; justify-content: flex-start;">
+    <MudSelect T="string" Label="Вид материал" Variant="Variant.Outlined" ValueChanged="GetType" Value="currentType" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+        @foreach (var type in types)
+        {
+            <MudSelectItem Value="@(type.Title)" />
+        }
+    </MudSelect>
+</div>
+
+<div style="position:absolute">
+    <MudGrid Spacing="@spacing" Justify="Justify.FlexStart"
+             Style="position: absolute;
+        left: 190px;
+        top: 100px;
+        width: 1000px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #EEFFF7;
+    }">
+        @foreach (var material in materials)
+        {
+            <MudItem>
+                <MudPaper Height="100px" Width="210px" Class="d-flex align-center justify-center mud-width-full py-8" Style="background-color: #A68EFE; box-shadow: none; border-radius: 20px;">
+                    <a href="/" @onclick="() => GetMaterial(material)">
+                        <MudPaper Height="100px" Width="210px" Style="border: 3px solid #21A77F; box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px; border-radius: 20px;">
+                            <MudText Class="d-flex align-center justify-center mud-width-full py-8" Style="font-size: 25px; font-weight: 500;">@material.Title</MudText>
+                        </MudPaper>
+                    </a>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+</div>
+
+@code {
+    private int spacing { get; set; } = 5;
+
+    private List<CareMaterial> materials = new List<CareMaterial>();
+    private List<MaterialType> types = new List<MaterialType>();
+
+    private static readonly MaterialType _allTypes = new MaterialType() { Title = "Все" };
+
+    private string currentType = "Все";
+
+    protected override async Task OnInitializedAsync()
+    {
+        types = Context.MaterialTypes.ToList();
+        types.Add(_allTypes);
+        materials = Context.CareMaterials.Where(x => x.Quantity != 0).ToList();
+    }
+
+    private void GetType(string selected)
+    {
+        currentType = selected;
+
+        if (currentType == "Все")
+        {
+            materials = Context.CareMaterials.Where(x => x.Quantity != 0).ToList();
+            return;
+        }
+
+        var typeId = Context.MaterialTypes.FirstOrDefault(x => x.Title == currentType).Id;
+        materials = Context.CareMaterials.Where(x => x.Quantity != 0 && x.TypeId == typeId).ToList();
+    }
+
+    private void GetMaterial(CareMaterial material)
+    {
+        //Navigation.NavigateTo($"/animal_info/{animal.Id}");
+    }
+}

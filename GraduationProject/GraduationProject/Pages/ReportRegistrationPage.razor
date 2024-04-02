@@ -1,0 +1,38 @@
+﻿@page "/report_registration"
+
+@using GraduationProject.Services
+@inject CurrentElementService CurrentElement
+
+<style>
+    .paper {
+        position: absolute;
+        left: 180px;
+        top: 100px;
+        width: 1000px;
+        height: 550px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #EEFFF7;
+        border-radius: 30px;
+    }
+</style>
+
+<MudPaper Class="paper">
+    <div class="mainblock">
+        <div>
+            <MudText Class="labelText">Фамилия</MudText>
+            <input @bind-value="CurrentElement.CurrentUser.Surname" />
+        </div>
+        <div>
+            <MudText Class="labelText">Имя</MudText>
+            <input @bind-value="CurrentElement.CurrentUser.Name" />
+        </div>
+        <div>
+            <MudText Class="labelText">Отчество</MudText>
+            <input @bind-value="CurrentElement.CurrentUser.Patronymic" />
+        </div>
+    </div>
+</MudPaper>
+
+@code {
+
+}

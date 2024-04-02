@@ -1,0 +1,349 @@
+﻿@page "/employees_list"
+@using GraduationProject.DataBase
+@inject GraduationProjectContext Context
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>СПИСОК СОТРУДНИКОВ</PageTitle>
+
+<style>
+    .mainLabel {
+        text-align: center;
+        margin-right: 90px;
+        margin-bottom: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+
+    .nameText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-left: 7px;
+        text-align: center;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-left: 7px;
+        text-align: left;
+    }
+
+    .imgBlock {
+        flex: 50%;
+        text-align: center;
+        margin-left: 100px;
+        width: 400px;
+        height: 400px;
+    }
+</style>
+
+<div style="position: absolute; left: 190px; width: 1000px;display: flex; flex-direction: row; justify-content: flex-start;">
+    <MudSelect T="string" Label="Должность" Variant="Variant.Outlined" ValueChanged="GetRole" Value="currentRole" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+        @foreach (var role in rolesFilt)
+        {
+                <MudSelectItem Value="@(role.Title)" />
+        }
+    </MudSelect>
+    <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 63px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F; left:7px;" OnClick="OpenAddDialog">Добавить сотрудника</MudButton>
+</div>
+
+<div style="position:absolute">
+    <MudGrid Spacing="@spacing" Justify="Justify.FlexStart"
+                Style="position: absolute;
+        left: 190px;
+        top: 100px;
+        width: 1000px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        border-radius: 30px;
+        background-color: #EEFFF7;
+    }">
+        @foreach (var user in users)
+        {
+                <MudItem>
+                    <MudPaper Height="330px" Width="210px" Class="d-flex align-center justify-center mud-width-full py-8" Style="background-color: #A68EFE; box-shadow: none; border-radius: 20px;">
+                        <a @onclick="() => GetUser(user)">
+                            <MudPaper Height="330px" Width="210px" Style="border: 3px solid #21A77F; box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px; border-radius: 20px;">
+                            @if (user.Image != null)
+                            {
+                                        <img src="@GetImage(user)" style="height:200px; width:100%; background-color: #EEFFF7; border-radius: 17px 17px 0 0;" />
+                            }
+                            else
+                            {
+                                        <img src="/images/Лого.png" style="height:200px; width:100%; background-color: #EEFFF7; border-radius: 20px 20px 0 0;" />
+                            }
+                                <MudText Class="nameText">@user.Surname </MudText>
+                                <MudText Class="nameText">@user.Name </MudText>
+                                <MudText Class="nameText">@user.Patronymic</MudText>
+                            </MudPaper>
+                        </a>
+                    </MudPaper>
+                </MudItem>
+        }
+    </MudGrid>
+</div>
+
+<MudDialog @bind-IsVisible="visible" Options="options" Style="height: 580px;">
+    <TitleContent>
+        <MudText Style="font-size: 30px">
+            Добавление сотрудника
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="mainblock">
+            <div>
+                <MudText Class="labelText">Фамилия<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="employeeSurname" />
+            </div>
+            <div>
+                <MudText Class="labelText">Имя<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="employeeName" />
+            </div>
+            <div>
+                <MudText Class="labelText">Отчество</MudText>
+                <input @bind-value="employeePatronymic" />
+            </div>
+            <div>
+                <MudText Class="labelText">Вид документа<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="identityDoc" />
+            </div>
+            <div>
+                <MudText Class="labelText">Серия<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="series" />
+            </div>
+            <div>
+                <MudText Class="labelText">Номер<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="number" />
+            </div>
+            <div>
+                <MudText Class="labelText">Кем выдан<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="issuedPlace" />
+            </div>
+            <div>
+                <MudText Class="labelText">Код подразделения<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="divissionCode" />
+            </div>
+            <div>
+                <MudText Class="labelText">Дата выдачи<span style="visibility: @visible"> *</span></MudText>
+                <MudDatePicker @bind-Date="issueDate" DisableToolbar="true" Style="width: 380px; margin-left: 10px;" />
+            </div>
+            <div>
+                <MudText Class="labelText">Дата рождения<span style="visibility: @visible"> *</span></MudText>
+                <MudDatePicker @bind-Date="birthDate" DisableToolbar="true" Style="width: 380px; margin-left: 10px;" />
+            </div>
+            <div>
+                <MudText Class="labelText">Пол<span style="visibility: @visible"> *</span></MudText>
+                <MudSelect T="string" Label="Пол" Variant="Variant.Outlined" @bind-Value="gender" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                    @foreach (var g in genders)
+                    {
+                            <MudSelectItem Value="@(g.Title)" />
+                    }
+                </MudSelect>
+            </div>
+            <div>
+                <MudText Class="labelText">Должность<span style="visibility: @visible"> *</span></MudText>
+                <MudSelect T="string" Label="Должность" Variant="Variant.Outlined" @bind-Value="employeeRole" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                    @foreach (var role in roles)
+                    {
+                            <MudSelectItem Value="@(role.Title)" />
+                    }
+                </MudSelect>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 50px; font-size: 15px; border: 3px solid #21A77F; color: #21A77F; margin-right: 7px;" OnClick="Add">Добавить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private int spacing { get; set; } = 5;
+
+    private List<User> users = new List<User>();
+    private List<Role> rolesFilt = new List<Role>();
+    private List<Role> roles = new List<Role>();
+    private List<PersonGender> genders = new List<PersonGender>();
+    private static readonly Role _allRoles = new Role() { Title = "Все" };
+
+    private bool visible;
+    private DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+
+    private string currentRole = "Все";
+    private string employeeSurname = "";
+    private string employeeName = "";
+    private string employeePatronymic = "";
+    private string employeeRole = "";
+    private string identityDoc = "";
+    private string series = "";
+    private string number = "";
+    private string issuedPlace = "";
+    private string divissionCode = "";
+    private string gender = "";
+
+    private DateTime? issueDate = DateTime.Today;
+    private DateTime? birthDate = DateTime.Today.AddYears(-18);
+    string dateFormat = "dd.MM.yyyy";
+
+    protected override void OnInitialized()
+    {
+        rolesFilt = Context.Roles.Where(x => x.Title != "Администратор").ToList();
+        roles = Context.Roles.Where(x => x.Title != "Администратор").ToList();
+        genders = Context.PersonGenders.ToList();
+        rolesFilt.Add(_allRoles);
+        ListUpdate();
+    }
+
+    private string GetImage(User user) => $"/images/Users/{user.Image}";
+
+    private void GetUser(User user) => Navigation.NavigateTo($"/employee_page/{user.Id}");
+
+    private void ListUpdate()
+    {
+        users = Context.Users.Where(x => x.RoleId != 1 && x.IsDeleted == false).ToList();
+        users.Reverse();
+    }
+
+    private void OpenAddDialog()
+    {
+        GetNull();
+        visible = true;
+    }
+
+    private void GetRole(string selected)
+    {
+        currentRole = selected;
+
+        if (currentRole == "Все")
+        {
+            ListUpdate();
+            return;
+        }
+
+        var roleId = Context.Roles.FirstOrDefault(x => x.Title == currentRole).Id;
+        users = Context.Users.Where(x => x.RoleId == roleId && x.IsDeleted == false).ToList();
+        users.Reverse();
+    }
+
+    private void Add()
+    {
+        if (employeeSurname == "" ||
+        employeeName == "" ||
+        employeeRole == "" ||
+        identityDoc == "" ||
+        series == "" ||
+        number == "" ||
+        issuedPlace == "" ||
+        divissionCode == "" ||
+        gender == "")
+        {
+            Snackbar.Add("Для добавления сотрудника все обязательные поля должны быть заполнены!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            return;
+        }
+
+        if (!StringIsDigits(series) || !StringIsDigits(number) || !StringIsDigits(divissionCode))
+        {
+            if (!StringIsDigits(series))
+            {
+                Snackbar.Add("Серия должна состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (!StringIsDigits(number))
+            {
+                Snackbar.Add("Номер должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (!StringIsDigits(divissionCode))
+            {
+                Snackbar.Add("Код подразделения должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+            return;
+        }
+
+        if (series.Length > 4 || series.Length < 4 ||
+            number.Length > 6 || number.Length < 6 ||
+            divissionCode.Length > 6 || divissionCode.Length < 6)
+        {
+            if (series.Length > 4 || series.Length < 4)
+            {
+                Snackbar.Add("Серия должна состоять из 4 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (number.Length > 6 || number.Length < 6)
+            {
+                Snackbar.Add("Номер должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (divissionCode.Length > 6 || divissionCode.Length < 6)
+            {
+                Snackbar.Add("Код подразделения должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+            return;
+        }
+
+        if (birthDate > DateTime.Today.AddYears(-18) || issueDate > DateTime.Today)
+        {
+            Snackbar.Add("Даты заполнены некорректно!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            return;
+        }
+
+        var crntRole = Context.Roles.FirstOrDefault(x => x.Title == employeeRole).Id;
+        var crntGender = Context.PersonGenders.FirstOrDefault(x => x.Title == gender).Id;
+
+        var newUser = new User()
+            {
+                Surname = employeeSurname,
+                Name = employeeName,
+                Patronymic = employeePatronymic,
+                RoleId = crntRole,
+                IdentityDocument = identityDoc,
+                DocumentSeries = int.Parse(series),
+                DocumentNumber = int.Parse(number),
+                IssuedPlace = issuedPlace,
+                DivissionCode = divissionCode,
+                IssuedDate = issueDate,
+                BirthDate = birthDate,
+                GenderId = crntGender,
+                IsDeleted = false
+            };
+
+        Context.Users.Add(newUser);
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+
+        Snackbar.Add("Сотрудник успешно добавлен!", Severity.Success, config => { config.ShowCloseIcon = false; });
+        visible = false;
+        GetNull();
+        ListUpdate();
+    }
+
+    private bool StringIsDigits(string s)
+    {
+        foreach (var item in s)
+        {
+            if (!char.IsDigit(item))
+                return false;
+        }
+        return true;
+    }
+
+    private void GetNull()
+    {
+        employeeSurname = "";
+        employeeName = "";
+        employeePatronymic = "";
+        employeeRole = "";
+        identityDoc = "";
+        series = "";
+        number = "";
+        issuedPlace = "";
+        divissionCode = "";
+        gender = "";
+        issueDate = DateTime.Today;
+        birthDate = DateTime.Today.AddYears(-18);
+    }
+}

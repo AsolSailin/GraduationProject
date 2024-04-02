@@ -1,0 +1,361 @@
+﻿@page "/employee_page/{currentEmployeeId}"
+@using GraduationProject.DataBase
+@using GraduationProject.RazorComponents;
+@inject GraduationProjectContext Context
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>СТРАНИЦА СОТРУДНИКА</PageTitle>
+
+<style>
+    .paper {
+        position: absolute;
+        left: 180px;
+        top: 100px;
+        width: 1000px;
+        height: 550px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #EEFFF7;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-right: 90px;
+        margin-bottom: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: 7px;
+    }
+
+    .href {
+        color: #5FCEAD;
+        text-decoration: underline;
+    }
+
+        .href:hover {
+            color: #21A77F;
+        }
+
+    .fieldsBlock {
+        flex: 50%;
+        margin-left: 50px;
+        margin-right: 50px;
+        height: 450px;
+        overflow-y: scroll;
+    }
+
+    .imgBlock {
+        flex: 50%;
+        text-align: center;
+        margin-left: 50px;
+        width: 400px;
+        height: 400px;
+    }
+</style>
+
+<MudPaper Class="paper">
+    <div style="display:flex; flex-direction: row;">
+        <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 63px; font-size: 16px; border: 3px solid #21A77F; color: #21A77F; left:7px;" OnClick="@Delete">Удалить</MudButton>
+        @if (edit)
+        {
+                <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 63px; font-size: 16px; border: 3px solid #21A77F; color: #21A77F; left:7px;" OnClick="@GetEdit">Изменить</MudButton>
+        }
+        else
+        {
+                <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 63px; font-size: 16px; border: 3px solid #21A77F; color: #21A77F; left:7px;" OnClick="@Edit">Сохранить изменения</MudButton>
+        }
+    </div>
+    <div class="mainBlock">
+        <div class="imgBlock">
+            <MudAvatar Style="height:400px; width:400px; background-color: #EEFFF7; border: 3px solid #21A77F; box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;" Image="@imagePath"></MudAvatar>
+        </div>
+        <div class="fieldsBlock">
+            <div>
+                <MudText Class="labelText">Фамилия<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="employeeSurname" readonly="@edit" />
+            </div>
+            <div>
+                <MudText Class="labelText">Имя<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="employeeName" readonly="@edit" />
+            </div>
+            <div>
+                <MudText Class="labelText">Отчество</MudText>
+                <input @bind-value="employeePatronymic" readonly="@edit" />
+            </div>
+            <div>
+                <MudText Class="labelText">@identityDoc</MudText>
+            </div>
+            <div>
+                <MudText Class="labelText">Серия<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="series" readonly="@edit" />
+            </div>
+            <div>
+                <MudText Class="labelText">Номер<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="number" readonly="@edit" />
+            </div>
+            <div>
+                <MudText Class="labelText">Кем выдан<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="issuePlace" readonly="@edit" />
+            </div>
+            <div>
+                <MudText Class="labelText">Код подразделения<span style="visibility: @visible"> *</span></MudText>
+                <input @bind-value="divissionCode" />
+            </div>
+            <div>
+                <MudText Class="labelText">Дата выдачи<span style="visibility: @visible"> *</span></MudText>
+                @if (edit)
+                {
+                        <input @bind-value="issueDateStr" readonly="@edit" />
+                }
+                else
+                {
+                        <MudDatePicker @bind-Date="issueDate" DisableToolbar="true" Style="width: 395px; margin-left: 10px;" />
+                }
+            </div>
+            <div>
+                <MudText Class="labelText">Дата рождения<span style="visibility: @visible"> *</span></MudText>
+                @if (edit)
+                {
+                        <input @bind-value="birthDateStr" readonly="@edit" />
+                }
+                else
+                {
+                        <MudDatePicker @bind-Date="birthDate" DisableToolbar="true" Style="width: 395px; margin-left: 10px;" />
+                }
+            </div>
+            <div>
+                <MudText Class="labelText">Пол<span style="visibility: @visible"> *</span></MudText>
+                @if (edit)
+                {
+                        <input @bind-value="gender" readonly="@edit" />
+                }
+                else
+                {
+                        <MudSelect T="string" Label="Пол" Variant="Variant.Outlined" @bind-Value="gender" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                        @foreach (var g in genders)
+                        {
+                                    <MudSelectItem Value="@(g.Title)" />
+                        }
+                        </MudSelect>
+                }
+            </div>
+            <div>
+                <MudText Class="labelText">Должность<span style="visibility: @visible"> *</span></MudText>
+                @if (edit)
+                {
+                        <input @bind-value="employeeRole" readonly="@edit" />
+                }
+                else
+                {
+                        <MudSelect T="string" Label="Должность" Variant="Variant.Outlined" @bind-Value="employeeRole" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                        @foreach (var role in roles)
+                        {
+                                    <MudSelectItem Value="@(role.Title)" />
+                        }
+                        </MudSelect>
+                }
+            </div>
+        </div>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? currentEmployeeId { get; set; }
+
+    private List<Role> roles = new List<Role>();
+    private List<PersonGender> genders = new List<PersonGender>();
+
+    private User currentUser = new User();
+
+    private DateTime? issueDate = DateTime.Today;
+    private DateTime? birthDate = DateTime.Today.AddYears(-18);
+
+    private string issueDateStr = "";
+    private string birthDateStr = "";
+
+    private string employeeSurname = "";
+    private string employeeName = "";
+    private string employeePatronymic = "";
+    private string employeeRole = "";
+    private string identityDoc = "";
+    private string series = "";
+    private string number = "";
+    private string issuePlace = "";
+    private string divissionCode = "";
+    private string gender = "";
+    private string imagePath = "";
+
+    private string visible = "hidden";
+
+    private bool edit = true;
+
+    protected override void OnInitialized()
+    {
+        currentUser = Context.Users.FirstOrDefault(x => x.Id == int.Parse(currentEmployeeId));
+        roles = Context.Roles.ToList();
+        genders = Context.PersonGenders.ToList();
+
+        GetFields();
+        GetImage();
+        GetDate();
+    }
+
+    private void GetImage() => imagePath = $"/images/Users/{currentUser.Image}";
+
+    private void GetEdit() => edit = false;
+
+    private void GetFields()
+    {
+        employeeSurname = currentUser.Surname;
+        employeeName = currentUser.Name;
+        employeePatronymic = currentUser.Patronymic;
+        employeeRole = Context.Roles.FirstOrDefault(x => x.Id == currentUser.RoleId).Title;
+        identityDoc = currentUser.IdentityDocument;
+        series = (currentUser.DocumentSeries).ToString();
+        number = (currentUser.DocumentNumber).ToString();
+        issueDate = currentUser.IssuedDate;
+        birthDate = currentUser.BirthDate;
+        issuePlace = currentUser.IssuedPlace;
+        divissionCode = currentUser.DivissionCode;
+        gender = Context.PersonGenders.FirstOrDefault(x => x.Id == currentUser.GenderId).Title;
+    }
+
+    private void GetData()
+    {
+        currentUser.Surname = employeeSurname;
+        currentUser.Name = employeeName;
+        currentUser.Patronymic = employeePatronymic;
+        currentUser.RoleId = Context.Roles.FirstOrDefault(x => x.Title == employeeRole).Id;
+        currentUser.IdentityDocument = identityDoc;
+        currentUser.DocumentSeries = int.Parse(series);
+        currentUser.DocumentNumber = int.Parse(number);
+        currentUser.IssuedDate = issueDate;
+        currentUser.BirthDate = birthDate;
+        currentUser.IssuedPlace = issuePlace;
+        currentUser.DivissionCode = divissionCode;
+        currentUser.GenderId = Context.PersonGenders.FirstOrDefault(x => x.Title == gender).Id;
+    }
+
+    private async Task Delete()
+    {
+        var result = await DialogService.Show<AcceptDialog>($"Вы уверены, что хотите удалить этого сотрудника из зоопарка?").Result;
+
+        if (!result.Canceled)
+        {
+            currentUser.IsDeleted = true;
+            Context.Users.Update(currentUser);
+            Context.SaveChanges();
+            Snackbar.Add("Сотрудник успешно удален!", Severity.Success, config => { config.ShowCloseIcon = false; });
+            Navigation.NavigateTo("/employees_list");
+        }
+    }
+
+    private bool StringIsDigits(string s)
+    {
+        foreach (var item in s)
+        {
+            if (!char.IsDigit(item))
+                return false;
+        }
+        return true;
+    }
+
+    private void GetDate()
+    {
+        var age = DateTime.Today.Year - currentUser.BirthDate.Value.Year;
+        var lastDigit = age % 10;
+        var year = "";
+
+        if (lastDigit == 1) year = "год";
+        else if (lastDigit >= 2 && lastDigit <= 4) year = "года";
+        else year = "лет";
+
+        birthDateStr = $"{currentUser.BirthDate.Value.ToString("d")} ({age.ToString()} {year})";
+        issueDateStr = currentUser.IssuedDate.Value.ToString("d");
+    }
+
+    private void Edit()
+    {
+        if (employeeSurname == "" ||
+        employeeName == "" ||
+        employeeRole == "" ||
+        identityDoc == "" ||
+        series == "" ||
+        number == "" ||
+        issuePlace == "" ||
+        divissionCode == "" ||
+        gender == "")
+        {
+            Snackbar.Add("Для изменения данных сотрудника все обязательные поля должны быть заполнены!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            return;
+        }
+
+        if (!StringIsDigits(series) || !StringIsDigits(number) || !StringIsDigits(divissionCode))
+        {
+            if (!StringIsDigits(series))
+            {
+                Snackbar.Add("Серия должна состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (!StringIsDigits(number))
+            {
+                Snackbar.Add("Номер должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (!StringIsDigits(divissionCode))
+            {
+                Snackbar.Add("Код подразделения должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+            return;
+        }
+
+        if (series.Length > 4 || series.Length < 4 ||
+            number.Length > 6 || number.Length < 6 ||
+            divissionCode.Length > 6 || divissionCode.Length < 6)
+        {
+            if (series.Length > 4 || series.Length < 4)
+            {
+                Snackbar.Add("Серия должна состоять из 4 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (number.Length > 6 || number.Length < 6)
+            {
+                Snackbar.Add("Номер должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+
+            if (divissionCode.Length > 6 || divissionCode.Length < 6)
+            {
+                Snackbar.Add("Код подразделения должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            }
+            return;
+        }
+
+        if (birthDate > DateTime.Today.AddYears(-18) || issueDate > DateTime.Today)
+        {
+            Snackbar.Add("Даты заполнены некорректно!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            return;
+        }
+
+        GetData();
+        Context.Users.Update(currentUser);
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+        Snackbar.Add("Данные сотрудника успешно изменены!", Severity.Success, config => { config.ShowCloseIcon = false; });
+        GetDate();
+        visible = "hidden";
+        edit = true;
+    }
+}
