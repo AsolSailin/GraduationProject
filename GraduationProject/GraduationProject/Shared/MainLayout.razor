@@ -2,6 +2,15 @@
 
 <PageTitle>GraduationProject</PageTitle>
 
+<MudThemeProvider Theme="_currentTheme" />
+<MudDialogProvider FullWidth="true"
+                   MaxWidth="MaxWidth.ExtraSmall"
+                   CloseButton="true"
+                   DisableBackdropClick="true"
+                   Position="DialogPosition.Center"
+                   CloseOnEscapeKey="true" />
+<MudSnackbarProvider />
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
@@ -17,3 +26,26 @@
         </article>
     </main>
 </div>
+
+@code {
+    private readonly MudTheme _currentTheme = new()
+        {
+            Palette = new PaletteLight
+            {
+                TextSecondary = "#21A77F",
+                TextPrimary = "#21A77F",
+                Primary = "#21A77F",
+                Black = "#000000",
+                White = "#FFFFFF",
+                Secondary = "#00FF00",
+                Tertiary = "#0000FF",
+                Success = "#21A77F",
+                Info = "#FFFF00",
+                Warning = "#FF00FF",
+                Error = "#C0C0C0",
+                Dark = "#333333",
+                Background = "#FFFFFF",
+                PrimaryDarken = "#21A77F"
+            }
+        };
+}
