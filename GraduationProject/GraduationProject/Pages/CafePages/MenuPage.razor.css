@@ -1,0 +1,24 @@
+﻿.imgBlock {
+    flex: 50%;
+    text-align: center;
+    margin-left: 30px;
+    margin-top: 10px;
+}
+
+input {
+    height: 45px;
+    width: 350px;
+    color: #784421;
+    font-size: 20px;
+    border: 3px solid #784421;
+    border-radius: 10px;
+    padding: 5px;
+    background-color: #d38d5f;
+    box-shadow: rgb(38, 57, 77) 0px 0px 3px -0px;
+}
+
+    input:focus {
+        color: #784421;
+        outline: none;
+        border: 2px solid #784421;
+    }

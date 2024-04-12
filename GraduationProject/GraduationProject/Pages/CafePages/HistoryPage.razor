@@ -1,0 +1,131 @@
+﻿@*@page "/history"
+
+@using CafeBlazor.DataBase
+@using System.Globalization
+@using CafeBlazor.Services
+@inject CurrentElementService CurrentElement
+@inject CafeContext Context
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>ИСТОРИЯ ЗАКАЗОВ</PageTitle>
+
+<style>
+    .paper {
+        position: absolute;
+        left: 180px;
+        top: 100px;
+        width: 1000px;
+        height: 550px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #fedcb7;
+        border-radius: 30px;
+    }
+
+    .mainLabelText {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 50px;
+        font-weight: 500;
+        color: #784421;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #784421;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: 7px;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-left: 50px;
+        margin-top: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #784421;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+</style>
+
+<MudPaper Class="paper">
+    <MudText Class="mainLabelText">История заказов</MudText>
+    <div>
+        <MudDatePicker Style="width: 25%; margin-left: auto; margin-right: auto; " Editable="true" Date="date" ImmediateText="true" Placeholder="день.месяц.год" DateFormat="@dateFormat" TextChanged="DatePickerTextChanged" Clearable="true" />
+    </div>
+    <div class="mainBlock">
+        <div class="tableBlock" style="overflow: scroll; height: 379px; width: 700px; margin-left: auto; margin-right: auto;">
+            @if (orderList.Count == 0)
+            {
+                <MudText Style="margin-left: auto; margin-right: auto; font-size: 30px; text-align: center; margin-top: 150px;">На эту дату заказы не были зарегистрированы</MudText>
+            }
+            else
+            {
+                <MudTable Items="@orderList" T="Order" Hover="true" @bind-SelectedItem="selectedItem" OnRowClick="@GetOrder" Style="border: solid 1px #925831; border-radius: 5px;">
+                    <RowTemplate>
+                        <MudTd DataLabel="Title" Style="font-size: 20px; margin-right: 0px">Заказ № @context.Id за @context.ReadyTime.ToString("d")</MudTd>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">на сумму: @context.PurchaseAmount</MudTd>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@GetStatus(context)</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+        </div>
+    </div>
+</MudPaper>
+
+
+
+@code {
+    DateTime? date = DateTime.Today;
+    string dateFormat = "dd.MM.yyyy";
+
+    private List<Order> orderList = new List<Order>();
+
+    private Order selectedItem = new Order();
+
+    protected override void OnInitialized()
+    {
+        GetOrderList();
+    }
+
+    private void GetOrder() => Navigation.NavigateTo($"/order_page/{selectedItem.Id}");
+
+    private void GetOrderList()
+    {
+        @if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Администратор")
+        {
+            orderList = Context.Orders.Where(x => x.ReadyTime == date).ToList();
+        }
+        else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Клиент")
+        {
+            orderList = Context.Orders.Where(x => x.UserId == CurrentElement.CurrentUser.Id && x.ReadyTime == date).ToList();
+        }
+    }
+
+    private void DatePickerTextChanged(string value)
+    {
+        if (value == null || value.Length < 6)
+        {
+            date = null;
+        }
+        else
+        {
+            string[] formats = { "ddMMyy", "dd.MM.yyyy", "dd.M.yyyy", "d.MM.yyyy", "d.M.yyyy", "dd.MM.yy", "dd.M.yy", "d.MM.yy", "d.M.yy" };
+
+            if (DateTime.TryParseExact(value, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime validDate)) date = validDate;
+            else date = null;
+        }
+
+        GetOrderList();
+    }
+
+    private string GetStatus(Order context)
+    {
+        return Context.OrderStatuses.FirstOrDefault(x => x.Id == context.StatusId).Title;
+    }
+}*@

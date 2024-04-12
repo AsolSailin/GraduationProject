@@ -1,0 +1,170 @@
+﻿@*@page "/order_page/{currentOrderId}"
+
+@using CafeBlazor.DataBase
+@using CafeBlazor.Services
+@inject CurrentElementService CurrentElement
+@inject CafeContext Context
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>СТРАНИЦА ЗАКАЗА</PageTitle>
+
+<style>
+    .paper {
+        position: absolute;
+        left: 180px;
+        top: 100px;
+        width: 1000px;
+        height: 550px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #fedcb7;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-right: 90px;
+        margin-bottom: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #784421;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #784421;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: 7px;
+    }
+
+    .fieldsBlock {
+        flex: 50%;
+        margin-bottom: 30px;
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
+    .listBlock {
+        flex: 50%;
+        text-align: center;
+        margin-left: 50px;
+        width: 400px;
+        height: 400px;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-left: 50px;
+        margin-top: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #784421;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+</style>
+
+<MudPaper Class="paper">
+    <div>
+        <MudText Class="mainLabel">Заказ № @currentOrder.Id от @currentOrder.ReadyTime.ToString("d")</MudText>
+    </div>
+    <div class="mainBlock">
+        <div class="fieldsBlock">
+            <div>
+                <MudText Class="labelText">Cумма заказа</MudText>
+                <input @bind-value="@amount" readonly="true" />
+            </div>
+            <div>
+                <MudText Class="labelText">Статус заказа</MudText>
+                @if (CurrentElement.CurrentRole == "Клиент")
+                {
+                    <input @bind-value="status" readonly="true" />
+                }
+                else if (CurrentElement.CurrentRole == "Администратор")
+                {
+                    <MudSelect Dense="true" T="string" Variant="Variant.Outlined" @bind-Value="status" Style="font-size: 20px; border: 3px solid #784421; color: #784421; border-radius: 10px;">
+                        @foreach (var status in statuses)
+                        {
+                            <MudSelectItem T="string" Value="@(status.Title)" />
+                        }
+                    </MudSelect>
+                    <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 20px; height: 50px; font-size: 16px; border: 3px solid #784421; color: #784421; margin-right: 20px" OnClick="@GetStatus">Сохранить изменения</MudButton>
+                }
+            </div>
+        </div>
+        <div class="tableBlock">
+            <MudText Class="labelText">Список блюд заказа:</MudText>
+            <MudTable T="Meal" Items="@mealList" @bind-SelectedItem="selectedItem" OnRowClick="@OnRowClick" Hover="true" Style="border: solid 1px #925831; border-radius: 5px; overflow: scroll; height: 317px">
+                <RowTemplate>
+                    <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Title</MudTd>
+                    <MudTd DataLabel="Title" Style="font-size: 20px;">@GetCount(context)</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+    </div>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string? currentOrderId { get; set; }
+
+    private List<MealOrder> mealOrderList = new List<MealOrder>();
+    private List<Meal> mealList = new List<Meal>();
+    private List<OrderStatus> statuses = new List<OrderStatus>();
+
+    private Order currentOrder = new Order();
+    private Meal selectedItem = new Meal();
+
+    private string status = "";
+    private string amount = "";
+    private string count = "";
+
+    private bool _selectOnRowClick = true;
+
+    protected override void OnInitialized()
+    {
+        GetData();
+    }
+
+    private void GetData()
+    {
+        currentOrder = Context.Orders.FirstOrDefault(x => x.Id == int.Parse(currentOrderId));
+        mealOrderList = Context.MealOrders.Where(x => x.OrderId == int.Parse(currentOrderId)).ToList();
+        status = Context.OrderStatuses.FirstOrDefault(x => x.Id == currentOrder.StatusId).Title;
+        statuses = Context.OrderStatuses.Where(x => x.Id >= currentOrder.StatusId).ToList();
+
+        foreach (MealOrder item in mealOrderList)
+        {
+            mealList.Add(Context.Meals.FirstOrDefault(x => x.Id == item.MealId));
+        }
+
+        GetAmount();
+    }
+
+    private void GetStatus()
+    {
+        currentOrder.StatusId = Context.OrderStatuses.FirstOrDefault(x => x.Title == status).Id;
+        Context.Orders.Update(currentOrder);
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+        Snackbar.Add("Данные заказа успешно изменены!", Severity.Success, config => { config.ShowCloseIcon = false; });
+        Navigation.NavigateTo("/history");
+    }
+
+    private void GetAmount()
+    {
+        amount = $"{currentOrder.PurchaseAmount} руб.";
+    }
+
+    private string GetCount(Meal meal)
+    {
+        count = Context.MealOrders.FirstOrDefault(x => x.OrderId == int.Parse(currentOrderId) || x.MealId == meal.Id).Count.ToString();
+        return $"{count} шт.";
+    }
+
+    public async Task OnRowClick(TableRowClickEventArgs<Meal> args) => Navigation.NavigateTo($"/meal_page/{selectedItem.Id}");
+}
+*@

@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Pages\CafePages\MealPage.razor.css" />
+    <None Remove="Pages\CafePages\MenuPage.razor.css" />
+    <None Remove="Pages\CafePages\OrderPage.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\CafePages\MealPage.razor.css" />
+    <Content Include="Pages\CafePages\MenuPage.razor.css" />
+    <Content Include="Pages\CafePages\OrderPage.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.17">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,8 +37,6 @@
     <Folder Include="Pages\WarehousemanPages\" />
     <Folder Include="Pages\MasterPages\" />
     <Folder Include="Pages\CleanerPages\" />
-    <Folder Include="Pages\CashierPages\" />
-    <Folder Include="Pages\ClientPages\" />
   </ItemGroup>
 
 </Project>
