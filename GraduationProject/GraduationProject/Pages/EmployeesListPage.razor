@@ -187,7 +187,6 @@
 
     private DateTime? issueDate = DateTime.Today;
     private DateTime? birthDate = DateTime.Today.AddYears(-18);
-    string dateFormat = "dd.MM.yyyy";
 
     protected override void OnInitialized()
     {
@@ -248,19 +247,14 @@
         if (!StringIsDigits(series) || !StringIsDigits(number) || !StringIsDigits(divissionCode))
         {
             if (!StringIsDigits(series))
-            {
                 Snackbar.Add("Серия должна состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            }
-
+            
             if (!StringIsDigits(number))
-            {
                 Snackbar.Add("Номер должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            }
-
+            
             if (!StringIsDigits(divissionCode))
-            {
                 Snackbar.Add("Код подразделения должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            }
+            
             return;
         }
 
@@ -269,19 +263,14 @@
             divissionCode.Length > 6 || divissionCode.Length < 6)
         {
             if (series.Length > 4 || series.Length < 4)
-            {
                 Snackbar.Add("Серия должна состоять из 4 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            }
-
+            
             if (number.Length > 6 || number.Length < 6)
-            {
                 Snackbar.Add("Номер должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            }
-
+            
             if (divissionCode.Length > 6 || divissionCode.Length < 6)
-            {
                 Snackbar.Add("Код подразделения должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            }
+            
             return;
         }
 

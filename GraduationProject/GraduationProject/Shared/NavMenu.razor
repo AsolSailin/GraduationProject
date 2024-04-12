@@ -14,9 +14,6 @@
     {
         @if (CurrentElement.CurrentRole == "Администратор")
         {
-            @*<MudNavLink Class="text" Href="/animals_list">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Животные
-            </MudNavLink>*@
             <MudNavLink Class="text" Href="/aviary_list">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Вольеры
             </MudNavLink>
@@ -26,11 +23,17 @@
             <MudNavLink Class="text" Href="/report_list">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Отчеты
             </MudNavLink>
-            @*<MudNavLink Class="text" Href="/materials_list">
+            <MudNavLink Class="text" Href="/materials_list">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Склад
-            </MudNavLink>*@
+            </MudNavLink>
         }
-        else if (CurrentElement.CurrentRole == "Дрессировщик")
+        else if (CurrentElement.CurrentRole == "")
+        {
+            <MudNavLink Class="text" Href="/report_list">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Отчеты
+            </MudNavLink>
+        }
+        else if (CurrentElement.CurrentRole == "Кипер")
         {
             <MudNavLink Class="text" Href="/report_list">
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Отчеты

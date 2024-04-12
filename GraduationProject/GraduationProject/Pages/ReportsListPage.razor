@@ -154,10 +154,7 @@ else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.Ro
 
     private void DatePickerTextChanged(string value)
     {
-        if (value == null || value.Length < 6)
-        {
-            date = null;
-        }
+        if (value == null || value.Length < 6) date = null;
         else
         {
             string[] formats = { "ddMMyy", "dd.MM.yyyy", "dd.M.yyyy", "d.MM.yyyy", "d.M.yyyy", "dd.MM.yy", "dd.M.yy", "d.MM.yy", "d.M.yy" };
