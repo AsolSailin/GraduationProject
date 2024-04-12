@@ -1,6 +1,53 @@
 ﻿@inherits LayoutComponentBase
+@using GraduationProject.Services
+@inject CurrentElementService CurrentElement
+@inject NavigationManager Navigation
 
-<PageTitle>GraduationProject</PageTitle>
+<PageTitle>ZooCoursework</PageTitle>
+
+<style>
+    .appBar {
+        background-image: linear-gradient(180deg, #21A77F 0%, #5FCEAD 70%);
+    }
+
+    .logo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .text {
+        color: #21A77F;
+    }
+</style>
+
+<CascadingValue Value="this">
+    <MudLayout Class="back">
+        <MudAppBar Class="appBar">
+            @if (CurrentElement.CurrentUser != null)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+                <MudSpacer />
+                <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" OnClick="GetAccount" Target="_blank" />
+                <MudIconButton Icon="@Icons.Material.Filled.ExitToApp" Color="Color.Inherit" OnClick="Exit" Target="_blank" />
+            }
+        </MudAppBar>
+        <MudDrawer @bind-Open="@open" Breakpoint="Breakpoint.Xxl" ClipMode="DrawerClipMode.Never" Variant="@DrawerVariant.Responsive">
+            <MudDrawerHeader>
+                <MudImage Src="/images/Лого.png" Class="logo"></MudImage><MudText Typo="Typo.h6" Class="text">САФАРИ</MudText>
+            </MudDrawerHeader>
+
+            <MudNavMenu>
+                <NavMenu @ref="@_navMenu" />
+            </MudNavMenu>
+
+        </MudDrawer>
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+</CascadingValue>
 
 <MudThemeProvider Theme="_currentTheme" />
 <MudDialogProvider FullWidth="true"
@@ -11,23 +58,25 @@
                    CloseOnEscapeKey="true" />
 <MudSnackbarProvider />
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
-
 @code {
+    bool open = false;
+    private NavMenu? _navMenu;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_navMenu is not null)
+            _navMenu.Update = true;
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void GetAccount() => Navigation.NavigateTo("/account");
+
+    private void Exit()
+    {
+        CurrentElement.CurrentUser = null;
+        Navigation.NavigateTo("/authorization");
+    }
+
     private readonly MudTheme _currentTheme = new()
         {
             Palette = new PaletteLight
@@ -48,4 +97,9 @@
                 PrimaryDarken = "#21A77F"
             }
         };
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
 }

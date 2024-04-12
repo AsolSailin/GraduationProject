@@ -57,6 +57,7 @@
     <MudPaper Class="paper">
         <MudText Class="mainLabelText">Список отчетов</MudText>
         <div class="mainBlock">
+            <MudDatePicker Style="width: 25%; margin-left: auto; margin-right: auto; " Editable="true" Date="date" ImmediateText="true" Placeholder="день.месяц.год" DateFormat="@dateFormat" TextChanged="DatePickerTextChanged" Clearable="true" />
             <div class="tableBlock" style="overflow: scroll; height: 379px; width: 700px; margin-left: auto; margin-right: auto;">
                 @if (reportsList.Count == 0)
                 {
