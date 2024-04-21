@@ -179,6 +179,7 @@
     private List<PersonGender> genders = new List<PersonGender>();
 
     private User currentUser = new User();
+    private Passport currentPassport = new Passport();
 
     private DateTime? issueDate = DateTime.Today;
     private DateTime? birthDate = DateTime.Today.AddYears(-18);
@@ -205,6 +206,7 @@
     protected override void OnInitialized()
     {
         currentUser = Context.Users.FirstOrDefault(x => x.Id == int.Parse(currentEmployeeId));
+        currentPassport = Context.Passports.FirstOrDefault(x => x.PassportNumber == currentUser.PassportId);
         roles = Context.Roles.ToList();
         genders = Context.PersonGenders.ToList();
 
@@ -223,13 +225,13 @@
         employeeName = currentUser.Name;
         employeePatronymic = currentUser.Patronymic;
         employeeRole = Context.Roles.FirstOrDefault(x => x.Id == currentUser.RoleId).Title;
-        identityDoc = currentUser.IdentityDocument;
-        series = (currentUser.DocumentSeries).ToString();
-        number = (currentUser.DocumentNumber).ToString();
-        issueDate = currentUser.IssuedDate;
+        identityDoc = Context.PassportTypes.FirstOrDefault(x => x.Id == currentPassport.PassportTypeId).Title;
+        series = (currentPassport.PassportSeries).ToString();
+        number = (currentPassport.PassportNumber).ToString();
+        issueDate = currentPassport.IssueDate;
         birthDate = currentUser.BirthDate;
-        issuePlace = currentUser.IssuedPlace;
-        divissionCode = currentUser.DivissionCode;
+        issuePlace = currentPassport.IssuePlace;
+        divissionCode = currentPassport.DivissionCode.ToString();
         gender = Context.PersonGenders.FirstOrDefault(x => x.Id == currentUser.GenderId).Title;
     }
 
@@ -238,15 +240,15 @@
         currentUser.Surname = employeeSurname;
         currentUser.Name = employeeName;
         currentUser.Patronymic = employeePatronymic;
-        currentUser.RoleId = Context.Roles.FirstOrDefault(x => x.Title == employeeRole).Id;
-        currentUser.IdentityDocument = identityDoc;
-        currentUser.DocumentSeries = int.Parse(series);
-        currentUser.DocumentNumber = int.Parse(number);
-        currentUser.IssuedDate = issueDate;
         currentUser.BirthDate = birthDate;
-        currentUser.IssuedPlace = issuePlace;
-        currentUser.DivissionCode = divissionCode;
         currentUser.GenderId = Context.PersonGenders.FirstOrDefault(x => x.Title == gender).Id;
+        currentUser.RoleId = Context.Roles.FirstOrDefault(x => x.Title == employeeRole).Id;
+        currentPassport.PassportTypeId = Context.PassportTypes.FirstOrDefault(x => x.Title == identityDoc).Id;
+        currentPassport.PassportSeries = int.Parse(series);
+        currentPassport.PassportNumber = int.Parse(number);
+        currentPassport.IssueDate = issueDate;
+        currentPassport.IssuePlace = issuePlace;
+        currentPassport.DivissionCode = int.Parse(divissionCode);
     }
 
     private async Task Delete()
@@ -284,7 +286,7 @@
         else year = "лет";
 
         birthDateStr = $"{currentUser.BirthDate.Value.ToString("d")} ({age.ToString()} {year})";
-        issueDateStr = currentUser.IssuedDate.Value.ToString("d");
+        issueDateStr = currentPassport.IssueDate.Value.ToString("d");
     }
 
     private void Edit()

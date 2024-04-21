@@ -19,6 +19,8 @@ public partial class GraduationProjectContext : DbContext
 
     public virtual DbSet<Animal> Animals { get; set; }
 
+    public virtual DbSet<AnimalDisease> AnimalDiseases { get; set; }
+
     public virtual DbSet<AnimalGender> AnimalGenders { get; set; }
 
     public virtual DbSet<AnimalKind> AnimalKinds { get; set; }
@@ -27,11 +29,39 @@ public partial class GraduationProjectContext : DbContext
 
     public virtual DbSet<Aviary> Aviaries { get; set; }
 
+    public virtual DbSet<Basket> Baskets { get; set; }
+
     public virtual DbSet<CareMaterial> CareMaterials { get; set; }
+
+    public virtual DbSet<Category> Categories { get; set; }
+
+    public virtual DbSet<Disease> Diseases { get; set; }
+
+    public virtual DbSet<DiseaseType> DiseaseTypes { get; set; }
+
+    public virtual DbSet<Kid> Kids { get; set; }
+
+    public virtual DbSet<MaritalStatus> MaritalStatuses { get; set; }
+
+    public virtual DbSet<MaterialSupplier> MaterialSuppliers { get; set; }
 
     public virtual DbSet<MaterialType> MaterialTypes { get; set; }
 
+    public virtual DbSet<Meal> Meals { get; set; }
+
+    public virtual DbSet<MealOrder> MealOrders { get; set; }
+
     public virtual DbSet<MeasurementUnit> MeasurementUnits { get; set; }
+
+    public virtual DbSet<Offspring> Offspring { get; set; }
+
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<OrderStatus> OrderStatuses { get; set; }
+
+    public virtual DbSet<Passport> Passports { get; set; }
+
+    public virtual DbSet<PassportType> PassportTypes { get; set; }
 
     public virtual DbSet<PersonGender> PersonGenders { get; set; }
 
@@ -39,17 +69,16 @@ public partial class GraduationProjectContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
-    public virtual DbSet<Season> Seasons { get; set; }
-
-    public virtual DbSet<SeasonMethod> SeasonMethods { get; set; }
-
-    public virtual DbSet<TemperatureMethod> TemperatureMethods { get; set; }
+    public virtual DbSet<Supplier> Suppliers { get; set; }
 
     public virtual DbSet<TypeAviary> TypeAviaries { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Vaccination> Vaccinations { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=LAPTOP-80QITHSR\\SQLEXPRES;Initial Catalog=GraduationProject;Integrated Security=True; TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -77,14 +106,18 @@ public partial class GraduationProjectContext : DbContext
             entity.ToTable("Animal");
 
             entity.Property(e => e.AviaryId).HasColumnName("Aviary_Id");
+            entity.Property(e => e.BinaryImage).HasColumnType("image");
             entity.Property(e => e.BirthDate).HasColumnType("date");
+            entity.Property(e => e.FeedRateInKg).HasColumnType("decimal(3, 0)");
             entity.Property(e => e.GenderId).HasColumnName("Gender_Id");
+            entity.Property(e => e.HeightInMetre).HasColumnType("decimal(3, 0)");
             entity.Property(e => e.Image)
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.WeightInKg).HasColumnType("decimal(3, 0)");
 
             entity.HasOne(d => d.Aviary).WithMany(p => p.Animals)
                 .HasForeignKey(d => d.AviaryId)
@@ -93,6 +126,23 @@ public partial class GraduationProjectContext : DbContext
             entity.HasOne(d => d.Gender).WithMany(p => p.Animals)
                 .HasForeignKey(d => d.GenderId)
                 .HasConstraintName("FK_Animal_AnimalGender");
+        });
+
+        modelBuilder.Entity<AnimalDisease>(entity =>
+        {
+            entity.ToTable("Animal_Disease");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
+            entity.Property(e => e.DiseaseId).HasColumnName("Disease_Id");
+
+            entity.HasOne(d => d.Animal).WithMany(p => p.AnimalDiseases)
+                .HasForeignKey(d => d.AnimalId)
+                .HasConstraintName("FK_Animal_Disease_Animal");
+
+            entity.HasOne(d => d.Disease).WithMany(p => p.AnimalDiseases)
+                .HasForeignKey(d => d.DiseaseId)
+                .HasConstraintName("FK_Animal_Disease_Disease");
         });
 
         modelBuilder.Entity<AnimalGender>(entity =>
@@ -158,14 +208,31 @@ public partial class GraduationProjectContext : DbContext
                 .HasConstraintName("FK_Aviary_TypeAviary");
         });
 
+        modelBuilder.Entity<Basket>(entity =>
+        {
+            entity.ToTable("Basket");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.MealId).HasColumnName("Meal_Id");
+            entity.Property(e => e.UserId).HasColumnName("User_Id");
+
+            entity.HasOne(d => d.Meal).WithMany(p => p.Baskets)
+                .HasForeignKey(d => d.MealId)
+                .HasConstraintName("FK_Basket_Meal");
+        });
+
         modelBuilder.Entity<CareMaterial>(entity =>
         {
             entity.ToTable("CareMaterial");
 
+            entity.Property(e => e.BinaryImage).HasColumnType("image");
             entity.Property(e => e.Description)
                 .HasMaxLength(500)
                 .IsUnicode(false);
             entity.Property(e => e.ExpiryDate).HasColumnType("date");
+            entity.Property(e => e.Image)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.MeasurementUnitId).HasColumnName("MeasurementUnit_Id");
             entity.Property(e => e.ProductionDate).HasColumnType("date");
             entity.Property(e => e.Title)
@@ -183,6 +250,91 @@ public partial class GraduationProjectContext : DbContext
                 .HasConstraintName("FK_CareMaterial_MaterialType");
         });
 
+        modelBuilder.Entity<Category>(entity =>
+        {
+            entity.ToTable("Category");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Disease>(entity =>
+        {
+            entity.ToTable("Disease");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.DiseaseTypeId).HasColumnName("DiseaseType_Id");
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.VaccinationId).HasColumnName("Vaccination_Id");
+
+            entity.HasOne(d => d.DiseaseType).WithMany(p => p.Diseases)
+                .HasForeignKey(d => d.DiseaseTypeId)
+                .HasConstraintName("FK_Disease_DiseaseType");
+
+            entity.HasOne(d => d.Vaccination).WithMany(p => p.Diseases)
+                .HasForeignKey(d => d.VaccinationId)
+                .HasConstraintName("FK_Disease_Vaccination");
+        });
+
+        modelBuilder.Entity<DiseaseType>(entity =>
+        {
+            entity.ToTable("DiseaseType");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Kid>(entity =>
+        {
+            entity.ToTable("Kid");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.BirthDate).HasColumnType("date");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Patronymic)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Surname)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<MaritalStatus>(entity =>
+        {
+            entity.ToTable("MaritalStatus");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<MaterialSupplier>(entity =>
+        {
+            entity.ToTable("Material_Supplier");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.MaterialId).HasColumnName("Material_Id");
+            entity.Property(e => e.Price).HasColumnType("decimal(7, 0)");
+            entity.Property(e => e.SupplierId).HasColumnName("Supplier_Id");
+
+            entity.HasOne(d => d.Material).WithMany(p => p.MaterialSuppliers)
+                .HasForeignKey(d => d.MaterialId)
+                .HasConstraintName("FK_Material_Supplier_CareMaterial");
+
+            entity.HasOne(d => d.Supplier).WithMany(p => p.MaterialSuppliers)
+                .HasForeignKey(d => d.SupplierId)
+                .HasConstraintName("FK_Material_Supplier_Supplier");
+        });
+
         modelBuilder.Entity<MaterialType>(entity =>
         {
             entity.ToTable("MaterialType");
@@ -192,6 +344,45 @@ public partial class GraduationProjectContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<Meal>(entity =>
+        {
+            entity.ToTable("Meal");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.BinaryImage).HasColumnType("image");
+            entity.Property(e => e.CategoryId).HasColumnName("Category_Id");
+            entity.Property(e => e.Description)
+                .HasMaxLength(250)
+                .IsUnicode(false);
+            entity.Property(e => e.ImagePath)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.Category).WithMany(p => p.Meals)
+                .HasForeignKey(d => d.CategoryId)
+                .HasConstraintName("FK_Meal_Category");
+        });
+
+        modelBuilder.Entity<MealOrder>(entity =>
+        {
+            entity.ToTable("Meal_Order");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.MealId).HasColumnName("Meal_Id");
+            entity.Property(e => e.OrderId).HasColumnName("Order_Id");
+
+            entity.HasOne(d => d.Meal).WithMany(p => p.MealOrders)
+                .HasForeignKey(d => d.MealId)
+                .HasConstraintName("FK_Meal_Order_Meal");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.MealOrders)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("FK_Meal_Order_Order");
+        });
+
         modelBuilder.Entity<MeasurementUnit>(entity =>
         {
             entity.ToTable("MeasurementUnit");
@@ -199,6 +390,69 @@ public partial class GraduationProjectContext : DbContext
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(2)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Offspring>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
+            entity.Property(e => e.KidId).HasColumnName("Kid_Id");
+
+            entity.HasOne(d => d.Animal).WithMany(p => p.Offspring)
+                .HasForeignKey(d => d.AnimalId)
+                .HasConstraintName("FK_Offspring_Animal");
+        });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("Order");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.ReadyTime).HasColumnType("date");
+            entity.Property(e => e.StatusId).HasColumnName("Status_Id");
+            entity.Property(e => e.UserId).HasColumnName("User_Id");
+
+            entity.HasOne(d => d.Status).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.StatusId)
+                .HasConstraintName("FK_Order_OrderStatus");
+        });
+
+        modelBuilder.Entity<OrderStatus>(entity =>
+        {
+            entity.ToTable("OrderStatus");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Passport>(entity =>
+        {
+            entity.HasKey(e => e.PassportNumber);
+
+            entity.ToTable("Passport");
+
+            entity.Property(e => e.PassportNumber).ValueGeneratedNever();
+            entity.Property(e => e.IssueDate).HasColumnType("date");
+            entity.Property(e => e.IssuePlace)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.PassportTypeId).HasColumnName("PassportType_Id");
+
+            entity.HasOne(d => d.PassportType).WithMany(p => p.Passports)
+                .HasForeignKey(d => d.PassportTypeId)
+                .HasConstraintName("FK_Passport_PassportType");
+        });
+
+        modelBuilder.Entity<PassportType>(entity =>
+        {
+            entity.ToTable("PassportType");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
                 .IsUnicode(false);
         });
 
@@ -243,37 +497,9 @@ public partial class GraduationProjectContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Season>(entity =>
+        modelBuilder.Entity<Supplier>(entity =>
         {
-            entity.ToTable("Season");
-
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<SeasonMethod>(entity =>
-        {
-            entity.ToTable("Season_Method");
-
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.MethodId).HasColumnName("Method_Id");
-            entity.Property(e => e.SeasonId).HasColumnName("Season_Id");
-
-            entity.HasOne(d => d.Method).WithMany(p => p.SeasonMethods)
-                .HasForeignKey(d => d.MethodId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Season_Method_TemperatureMethod");
-
-            entity.HasOne(d => d.Season).WithMany(p => p.SeasonMethods)
-                .HasForeignKey(d => d.SeasonId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Season_Method_Season");
-        });
-
-        modelBuilder.Entity<TemperatureMethod>(entity =>
-        {
-            entity.ToTable("TemperatureMethod");
+            entity.ToTable("Supplier");
 
             entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
@@ -295,29 +521,26 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("User");
 
+            entity.Property(e => e.BinaryImage).HasColumnType("image");
             entity.Property(e => e.BirthDate).HasColumnType("date");
             entity.Property(e => e.BirthPlace)
-                .HasMaxLength(500)
-                .IsUnicode(false);
-            entity.Property(e => e.DivissionCode)
-                .HasMaxLength(50)
+                .HasMaxLength(200)
                 .IsUnicode(false);
             entity.Property(e => e.GenderId).HasColumnName("Gender_Id");
-            entity.Property(e => e.IdentityDocument)
+            entity.Property(e => e.Image)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Image)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.IssuedDate).HasColumnType("date");
-            entity.Property(e => e.IssuedPlace)
-                .HasMaxLength(500)
-                .IsUnicode(false);
+            entity.Property(e => e.KidId).HasColumnName("Kid_Id");
+            entity.Property(e => e.MaritalStatusId).HasColumnName("MaritalStatus_Id");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.PassportId).HasColumnName("Passport_Id");
             entity.Property(e => e.Patronymic)
                 .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Registration)
+                .HasMaxLength(200)
                 .IsUnicode(false);
             entity.Property(e => e.RoleId).HasColumnName("Role_Id");
             entity.Property(e => e.Surname)
@@ -328,9 +551,31 @@ public partial class GraduationProjectContext : DbContext
                 .HasForeignKey(d => d.GenderId)
                 .HasConstraintName("FK_User_PersonGender");
 
+            entity.HasOne(d => d.Kid).WithMany(p => p.Users)
+                .HasForeignKey(d => d.KidId)
+                .HasConstraintName("FK_User_Kid");
+
+            entity.HasOne(d => d.MaritalStatus).WithMany(p => p.Users)
+                .HasForeignKey(d => d.MaritalStatusId)
+                .HasConstraintName("FK_User_MaritalStatus");
+
+            entity.HasOne(d => d.Passport).WithMany(p => p.Users)
+                .HasForeignKey(d => d.PassportId)
+                .HasConstraintName("FK_User_Passport");
+
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK_User_Role");
+        });
+
+        modelBuilder.Entity<Vaccination>(entity =>
+        {
+            entity.ToTable("Vaccination");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Title)
+                .HasMaxLength(10)
+                .IsFixedLength();
         });
 
         OnModelCreatingPartial(modelBuilder);

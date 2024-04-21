@@ -248,13 +248,13 @@
         {
             if (!StringIsDigits(series))
                 Snackbar.Add("Серия должна состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
+
             if (!StringIsDigits(number))
                 Snackbar.Add("Номер должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
+
             if (!StringIsDigits(divissionCode))
                 Snackbar.Add("Код подразделения должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
+
             return;
         }
 
@@ -264,13 +264,13 @@
         {
             if (series.Length > 4 || series.Length < 4)
                 Snackbar.Add("Серия должна состоять из 4 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
+
             if (number.Length > 6 || number.Length < 6)
                 Snackbar.Add("Номер должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
+
             if (divissionCode.Length > 6 || divissionCode.Length < 6)
                 Snackbar.Add("Код подразделения должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
+
             return;
         }
 
@@ -283,20 +283,25 @@
         var crntRole = Context.Roles.FirstOrDefault(x => x.Title == employeeRole).Id;
         var crntGender = Context.PersonGenders.FirstOrDefault(x => x.Title == gender).Id;
 
+        var newPassport = new Passport()
+        {
+                PassportNumber = int.Parse(number),
+                PassportSeries = int.Parse(series),
+                IssuePlace = issuedPlace,
+                IssueDate = issueDate,
+                DivissionCode = int.Parse(divissionCode),
+                PassportTypeId = Context.PassportTypes.FirstOrDefault(x => x.Title == identityDoc).Id,
+        };
+
         var newUser = new User()
             {
                 Surname = employeeSurname,
                 Name = employeeName,
                 Patronymic = employeePatronymic,
                 RoleId = crntRole,
-                IdentityDocument = identityDoc,
-                DocumentSeries = int.Parse(series),
-                DocumentNumber = int.Parse(number),
-                IssuedPlace = issuedPlace,
-                DivissionCode = divissionCode,
-                IssuedDate = issueDate,
                 BirthDate = birthDate,
                 GenderId = crntGender,
+                PassportId = newPassport.PassportNumber,
                 IsDeleted = false
             };
 

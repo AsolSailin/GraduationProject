@@ -21,7 +21,13 @@ public partial class CareMaterial
 
     public int? Quantity { get; set; }
 
+    public string? Image { get; set; }
+
+    public byte[]? BinaryImage { get; set; }
+
     public virtual ICollection<AnimalMaterial> AnimalMaterials { get; set; } = new List<AnimalMaterial>();
+
+    public virtual ICollection<MaterialSupplier> MaterialSuppliers { get; set; } = new List<MaterialSupplier>();
 
     public virtual MeasurementUnit? MeasurementUnit { get; set; }
 

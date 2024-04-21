@@ -19,9 +19,21 @@ public partial class Animal
 
     public bool? IsDeleted { get; set; }
 
+    public decimal? HeightInMetre { get; set; }
+
+    public decimal? WeightInKg { get; set; }
+
+    public decimal? FeedRateInKg { get; set; }
+
+    public byte[]? BinaryImage { get; set; }
+
+    public virtual ICollection<AnimalDisease> AnimalDiseases { get; set; } = new List<AnimalDisease>();
+
     public virtual ICollection<AnimalMaterial> AnimalMaterials { get; set; } = new List<AnimalMaterial>();
 
     public virtual Aviary? Aviary { get; set; }
 
     public virtual AnimalGender? Gender { get; set; }
+
+    public virtual ICollection<Offspring> Offspring { get; set; } = new List<Offspring>();
 }
