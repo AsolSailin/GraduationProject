@@ -50,4 +50,6 @@ public partial class User
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 
     public virtual Role? Role { get; set; }
+
+    public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
 }

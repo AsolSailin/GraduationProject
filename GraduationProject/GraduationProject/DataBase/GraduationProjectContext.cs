@@ -65,6 +65,8 @@ public partial class GraduationProjectContext : DbContext
 
     public virtual DbSet<PersonGender> PersonGenders { get; set; }
 
+    public virtual DbSet<PlannerTask> PlannerTasks { get; set; }
+
     public virtual DbSet<Report> Reports { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
@@ -74,6 +76,8 @@ public partial class GraduationProjectContext : DbContext
     public virtual DbSet<TypeAviary> TypeAviaries { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserTask> UserTasks { get; set; }
 
     public virtual DbSet<Vaccination> Vaccinations { get; set; }
 
@@ -132,7 +136,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Animal_Disease");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
             entity.Property(e => e.DiseaseId).HasColumnName("Disease_Id");
 
@@ -149,7 +152,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("AnimalGender");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -187,7 +189,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Aviary");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Image)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -212,7 +213,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Basket");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.MealId).HasColumnName("Meal_Id");
             entity.Property(e => e.UserId).HasColumnName("User_Id");
 
@@ -254,7 +254,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Category");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -264,7 +263,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Disease");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.DiseaseTypeId).HasColumnName("DiseaseType_Id");
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
@@ -284,7 +282,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("DiseaseType");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -294,7 +291,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Kid");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.BirthDate).HasColumnType("date");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
@@ -311,7 +307,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("MaritalStatus");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -321,7 +316,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Material_Supplier");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.MaterialId).HasColumnName("Material_Id");
             entity.Property(e => e.Price).HasColumnType("decimal(7, 0)");
             entity.Property(e => e.SupplierId).HasColumnName("Supplier_Id");
@@ -348,7 +342,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Meal");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.BinaryImage).HasColumnType("image");
             entity.Property(e => e.CategoryId).HasColumnName("Category_Id");
             entity.Property(e => e.Description)
@@ -370,7 +363,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Meal_Order");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.MealId).HasColumnName("Meal_Id");
             entity.Property(e => e.OrderId).HasColumnName("Order_Id");
 
@@ -387,7 +379,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("MeasurementUnit");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(2)
                 .IsUnicode(false);
@@ -395,7 +386,6 @@ public partial class GraduationProjectContext : DbContext
 
         modelBuilder.Entity<Offspring>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
             entity.Property(e => e.KidId).HasColumnName("Kid_Id");
 
@@ -408,7 +398,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Order");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.ReadyTime).HasColumnType("date");
             entity.Property(e => e.StatusId).HasColumnName("Status_Id");
             entity.Property(e => e.UserId).HasColumnName("User_Id");
@@ -422,7 +411,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("OrderStatus");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -434,7 +422,6 @@ public partial class GraduationProjectContext : DbContext
 
             entity.ToTable("Passport");
 
-            entity.Property(e => e.PassportNumber).ValueGeneratedNever();
             entity.Property(e => e.IssueDate).HasColumnType("date");
             entity.Property(e => e.IssuePlace)
                 .HasMaxLength(100)
@@ -450,7 +437,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("PassportType");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -460,7 +446,19 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("PersonGender");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Title)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<PlannerTask>(entity =>
+        {
+            entity.ToTable("PlannerTask");
+
+            entity.Property(e => e.Date).HasColumnType("date");
+            entity.Property(e => e.Description)
+                .HasMaxLength(150)
+                .IsUnicode(false);
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -501,7 +499,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("Supplier");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -511,7 +508,6 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("TypeAviary");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -568,11 +564,26 @@ public partial class GraduationProjectContext : DbContext
                 .HasConstraintName("FK_User_Role");
         });
 
+        modelBuilder.Entity<UserTask>(entity =>
+        {
+            entity.ToTable("User_Task");
+
+            entity.Property(e => e.TaskId).HasColumnName("Task_Id");
+            entity.Property(e => e.UserId).HasColumnName("User_Id");
+
+            entity.HasOne(d => d.Task).WithMany(p => p.UserTasks)
+                .HasForeignKey(d => d.TaskId)
+                .HasConstraintName("FK_User_Task_PlannerTask");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserTasks)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_User_Task_User");
+        });
+
         modelBuilder.Entity<Vaccination>(entity =>
         {
             entity.ToTable("Vaccination");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Title)
                 .HasMaxLength(10)
                 .IsFixedLength();

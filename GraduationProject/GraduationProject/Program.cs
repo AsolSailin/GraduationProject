@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using GraduationProject.Services;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<CurrentElementService>();
 builder.Services.AddSingleton<FileSystemService>();
+
+//To create SystemPages
+builder.Services.Configure<RazorPagesOptions>(options => options.RootDirectory = "/Pages/SystemPages");
 
 builder.Services.AddDbContext<GraduationProject.DataBase.GraduationProjectContext>(options =>
 {

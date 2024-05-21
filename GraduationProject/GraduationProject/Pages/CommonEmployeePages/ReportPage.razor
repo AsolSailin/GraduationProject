@@ -107,11 +107,23 @@
                     case "Ветеринар":
                         <MudText Class="labelText">Диаграмма лечения</MudText>
                         break;
-                    case "Дрессировщик":
+                    case "Кипер":
                         <MudText Class="labelText">Диаграмма питания</MudText>
+                        break;
+                    case "Кладовщик":
+                        <MudText Class="labelText">Диаграмма материалов</MudText>
+                        break;
+                    case "Строитель-ремонтник":
+                        <MudText Class="labelText">Диаграмма ремонтых работы</MudText>
                         break;
                     case "Уборщик":
                         <MudText Class="labelText">Диаграмма уборки</MudText>
+                        break;
+                    case "Билетный кассир":
+                        <MudText Class="labelText">Диаграмма продаж</MudText>
+                        break;
+                    case "Кассир кафе":
+                        <MudText Class="labelText">Диаграмма продаж</MudText>
                         break;
                 }
                 <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Bottom" Width="270px" Height="270px"
@@ -119,23 +131,35 @@
             </div>
         </div>
         <div style="margin-left: 50px; margin-right: 50px;">
-            <MudText Class="labelText">Отчетная таблица:</MudText>
-            <MudTable Items="@aviariesList" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
-                <HeaderContent>
-                    <MudTh>Номер вольера</MudTh>
-                    <MudTh>Название вольера</MudTh>
-                    <MudTh>Вид вольера</MudTh>
-                    <MudTh>Вид животных</MudTh>
-                    <MudTh>Количество животных</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Id</MudTd>
-                    <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Title</MudTd>
-                    <MudTd DataLabel="Title" Style="font-size: 20px;">@GetType(context)</MudTd>
-                    <MudTd DataLabel="Title" Style="font-size: 20px;">@GetKind(context)</MudTd>
-                    <MudTd DataLabel="Title" Style="font-size: 20px;">@GetCount(context)</MudTd>
-                </RowTemplate>
-            </MudTable>
+            @if (currentRole.Title == "Ветеринар" || currentRole.Title == "Кипер"
+            || currentRole.Title == "Строитель-ремонтник" || currentRole.Title == "Уборщик")
+            {
+                <MudText Class="labelText">Отчетная таблица:</MudText>
+                <MudTable Items="@aviariesList" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
+                    <HeaderContent>
+                        <MudTh>Номер вольера</MudTh>
+                        <MudTh>Название вольера</MudTh>
+                        <MudTh>Вид вольера</MudTh>
+                        <MudTh>Вид животных</MudTh>
+                        <MudTh>Количество животных</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Id</MudTd>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Title</MudTd>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@GetType(context)</MudTd>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@GetKind(context)</MudTd>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@GetCount(context)</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            }
+            else if (currentRole.Title == "Билетный кассир" || currentRole.Title == "Кассир кафе")
+            {
+
+            }
+            else if (currentRole.Title == "Кладовщик")
+            {
+                
+            }
         </div>
         <MudText style="font-size: 20px; margin-left: 50px; margin-top: 10px;">@currentReport.Description</MudText>
     </div>
@@ -182,7 +206,7 @@
                     labelsList.Add(item.Name);
                 }
                 break;
-            case "Дрессировщик":
+            case "Кипер":
                 foreach (Animal item in animalsList)
                 {
                     animalMaterials = Context.AnimalMaterials.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&

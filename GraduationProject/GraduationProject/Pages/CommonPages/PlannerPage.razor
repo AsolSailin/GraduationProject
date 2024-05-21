@@ -1,5 +1,159 @@
-﻿<h3>PlannerPage</h3>
+﻿@page "/planner"
+
+@using GraduationProject.DataBase
+@inject GraduationProjectContext Context
+
+<style>
+    .paper {
+        position: absolute;
+        left: 180px;
+        top: 100px;
+        width: 1000px;
+        height: 550px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        background-color: #EEFFF7;
+    }
+
+    .img {
+        width: 400px;
+        height: 400px;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-right: 90px;
+        margin-bottom: 30px;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        text-decoration: underline;
+        font-family: Andale Mono, monospace;
+    }
+
+    .mainLabelText {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 30px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: 7px;
+    }
+</style>
+
+<MudPaper Class="paper">
+    <MudText Class="mainLabelText">Планировщик задач</MudText>
+    <div style="margin-left: auto; margin-right: auto; text-align: center;">
+        <MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px; " Variant="Variant.Outlined">Добавить задачу</MudButton>
+    </div>
+    <hr />
+    <div class="tableBlock" style="overflow: scroll; height: 379px;  margin-left: auto; margin-right: auto;">
+        <MudTable Items="@Elements.Take(10)" Dense="true" @bind-SelectedItems="selectedItems" @bind-SelectedItem="selectedItem" @bind-SelectOnRowClick="@_selectOnRowClick" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true" Bordered="true"
+                  CustomHeader="true" CustomFooter="true" >
+            <HeaderContent>
+                <MudTHeadRow IgnoreCheckbox="true" Class="header-centered">
+                </MudTHeadRow>
+                <MudTHeadRow IsCheckable="true">
+                    <MudTh></MudTh>
+                    <MudTh>Название</MudTh>
+                    <MudTh>Дата</MudTh>
+                    <MudTh>Описание</MudTh>
+                    <MudTh>Изменение</MudTh>
+                    <MudTh>Удаление</MudTh>
+                    <MudTh>Закрепление</MudTh>
+                </MudTHeadRow>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="IsDone"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsDone)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 1)"></MudCheckBox></MudTd>
+                <MudTd DataLabel="Title">@context.Title</MudTd>
+                <MudTd DataLabel="Date">@GetShortDate(context.Date)</MudTd>
+                <MudTd DataLabel="Edit" Style="text-align: center"><MudTooltip Text="@context.Description"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Описание</MudButton></MudTooltip></MudTd>
+                <MudTd DataLabel="Edit" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Изменить</MudButton></MudTd>
+                <MudTd DataLabel="Delete" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Удалить</MudButton></MudTd>
+                @if (context.IsManagementFixed ?? false)
+                {
+                    <MudTd DataLabel="IsManagementFixed">закреплено</MudTd>
+                }
+                else
+                {
+                    <MudTd DataLabel="IsFixed"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsFixed)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 2)"></MudCheckBox></MudTd>
+                }
+            </RowTemplate>
+            <FooterContent>
+                <MudTFootRow IsCheckable="true">
+                    <MudTd colspan="5">Выполнено: @selectedItems.Count</MudTd>
+                </MudTFootRow>
+            </FooterContent>
+        </MudTable>
+    </div>
+    
+</MudPaper>
 
 @code {
+    private List<PlannerTask> Elements = new List<PlannerTask>();
+    private PlannerTask selectedItem = new PlannerTask();
+    private HashSet<PlannerTask> selectedItems = new HashSet<PlannerTask>();
+    private bool _selectOnRowClick = true;
+    private MudTable<PlannerTask> _table;
+    private bool check;
 
+    protected override void OnInitialized()
+    {
+        Update();
+    }
+
+    public void Update()
+    {
+        Elements.Clear();
+        Elements.AddRange(Context.PlannerTasks.Where(x => x.IsManagementFixed == true).ToList());
+        Elements.AddRange(Context.PlannerTasks.Where(x => x.IsFixed == true).ToList());
+        Elements.AddRange(Context.PlannerTasks.Where(x => x.IsManagementFixed != true && x.IsFixed != true).ToList());
+    }
+
+    String GetShortDate(DateTime? dateTime)
+    {
+        DateTime convertDate = (DateTime)dateTime;
+        return convertDate.ToShortDateString();
+    }
+
+    public bool BoolActive(bool? fix)
+    {
+        return fix ?? false;
+    }
+
+    public void ToCheck(PlannerTask plan, int doneOrFix)
+    {
+        if (doneOrFix == 1)
+        {
+            check = plan.IsDone ?? false;
+
+            if (!BoolActive(check))
+                plan.IsDone = true;
+            else
+                plan.IsDone = false;
+        }
+        else
+        {
+            check = plan.IsFixed ?? false;
+
+            if (!BoolActive(check))
+                plan.IsFixed = true;
+            else
+                plan.IsFixed = false;
+        }
+
+        Context.PlannerTasks.Update(plan);
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+        Update();
+    }      
 }
