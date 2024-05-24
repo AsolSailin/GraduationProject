@@ -29,6 +29,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MudBlazor" Version="6.19.1" />
+    <PackageReference Include="QuestPDF" Version="2024.3.7" />
+    <PackageReference Include="Syncfusion.Blazor.PdfViewer" Version="25.2.5" />
   </ItemGroup>
 
   <ItemGroup>
