@@ -1,5 +1,22 @@
-﻿<h3>AcceptDialog</h3>
+﻿@using GraduationProject.Services
+@inject CurrentElementService CurrentElement
+
+<MudDialog>
+    <DialogActions>
+        <MudButton Style="margin-top: 0px;" OnClick="Cancel">Отменить</MudButton>
+        @if (CurrentElement.DeleteOrEdit ?? false)
+        {
+            <MudButton Style="margin-top: 0px; color: #658dc3; " Color="Color.Primary" OnClick="Submit">Принять</MudButton>
+        }
+        else
+        {
+            <MudButton Style="margin-top: 0px; color: #658dc3; " Color="Color.Primary" OnClick="Submit">Принять</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
 
 @code {
-
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
 }

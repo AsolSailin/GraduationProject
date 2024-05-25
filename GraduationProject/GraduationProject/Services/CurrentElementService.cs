@@ -7,5 +7,6 @@ namespace GraduationProject.Services
         public Account? CurrentAccount { get; set; }
         public User? CurrentUser { get; set; }
         public string? CurrentRole { get; set; }
+        public bool? DeleteOrEdit { get; set; }
     }
 }

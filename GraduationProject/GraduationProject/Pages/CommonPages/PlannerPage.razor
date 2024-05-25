@@ -1,7 +1,12 @@
 ﻿@page "/planner"
 
 @using GraduationProject.DataBase
+@using GraduationProject.Services
+@using GraduationProject.RazorComponents
 @inject GraduationProjectContext Context
+@inject CurrentElementService CurrentElement
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
 
 <style>
     .paper {
@@ -53,7 +58,7 @@
 <MudPaper Class="paper">
     <MudText Class="mainLabelText">Планировщик задач</MudText>
     <div style="margin-left: auto; margin-right: auto; text-align: center;">
-        <MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px; " Variant="Variant.Outlined">Добавить задачу</MudButton>
+        <MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px; " Variant="Variant.Outlined" OnClick="OpenAddDialog">Добавить задачу</MudButton>
     </div>
     <hr />
     <div class="tableBlock" style="overflow: scroll; height: 379px;  margin-left: auto; margin-right: auto;">
@@ -76,9 +81,9 @@
                 <MudTd DataLabel="IsDone"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsDone)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 1)"></MudCheckBox></MudTd>
                 <MudTd DataLabel="Title">@context.Title</MudTd>
                 <MudTd DataLabel="Date">@GetShortDate(context.Date)</MudTd>
-                <MudTd DataLabel="Edit" Style="text-align: center"><MudTooltip Text="@context.Description"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Описание</MudButton></MudTooltip></MudTd>
-                <MudTd DataLabel="Edit" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Изменить</MudButton></MudTd>
-                <MudTd DataLabel="Delete" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Удалить</MudButton></MudTd>
+                <MudTd DataLabel="Description" Style="text-align: center"><MudTooltip Text="@context.Description"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Описание</MudButton></MudTooltip></MudTd>
+                <MudTd DataLabel="Edit" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => GetEdit(context))">Изменить</MudButton></MudTd>
+                <MudTd DataLabel="Delete" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => Delete(context))">Удалить</MudButton></MudTd>
                 @if (context.IsManagementFixed ?? false)
                 {
                     <MudTd DataLabel="IsManagementFixed">закреплено</MudTd>
@@ -88,13 +93,50 @@
                     <MudTd DataLabel="IsFixed"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsFixed)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 2)"></MudCheckBox></MudTd>
                 }
             </RowTemplate>
-            <FooterContent>
+            @*<FooterContent>
                 <MudTFootRow IsCheckable="true">
                     <MudTd colspan="5">Выполнено: @selectedItems.Count</MudTd>
                 </MudTFootRow>
-            </FooterContent>
+            </FooterContent>*@
         </MudTable>
     </div>
+
+<MudDialog @bind-IsVisible="visible" Options="options" >
+    <TitleContent>
+        @if (edit)
+        {
+            <MudText Style="font-size: 30px">Редактирование задачи</MudText>                
+        }
+        else
+        {
+            <MudText Style="font-size: 30px">Добавление задачи</MudText>
+        }
+    </TitleContent>
+    <DialogContent>
+        <div class="mainblock">
+            <div class="fieldsBlock">
+                <div>
+                    <MudText Class="labelText">Название</MudText>
+                    <input @bind-value="taskTitle" />
+                </div>
+                <div>
+                    <MudText Class="labelText">Описание</MudText>
+                    <input @bind-value="taskDescription"/>
+                </div>
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        @if (edit)
+        {
+            <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 50px; font-size: 15px; border: 3px solid #21A77F; color: #21A77F; margin-right: 7px;" OnClick="Edit">Изменить</MudButton>
+        }
+        else
+        {
+            <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 50px; font-size: 15px; border: 3px solid #21A77F; color: #21A77F; margin-right: 7px;" OnClick="Add">Добавить</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
     
 </MudPaper>
 
@@ -105,6 +147,12 @@
     private bool _selectOnRowClick = true;
     private MudTable<PlannerTask> _table;
     private bool check;
+    private bool visible;
+    private bool edit = false;
+    private string taskTitle = "";
+    private string taskDescription = "";
+    private DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
+    private PlannerTask currentTask = new PlannerTask();
 
     protected override void OnInitialized()
     {
@@ -155,5 +203,112 @@
         Context.SaveChanges();
         Context.ChangeTracker.Clear();
         Update();
-    }      
+    }     
+
+    private void GetEdit(PlannerTask plannerTask)
+    {
+        taskTitle = plannerTask.Title;
+        taskDescription = plannerTask.Description;
+        visible = true;
+        edit = true;
+        currentTask = plannerTask;
+    }
+
+    private async Task Edit()
+    {
+        CurrentElement.DeleteOrEdit = false;
+        var result = await DialogService.Show<AcceptDialog>($"Вы уверены, что хотите принять внесенные изменения?").Result;
+
+        if (!result.Canceled)
+        {
+            if (taskTitle == "")
+            {
+                taskTitle = "Без названия";
+            }
+
+            GetData(currentTask);
+            Context.PlannerTasks.Update(currentTask);
+            Context.SaveChanges();
+            Context.ChangeTracker.Clear();
+            Snackbar.Add("Задача успешно изменена!", Severity.Success, config => { config.ShowCloseIcon = false; });
+            visible = false;
+            Update();
+        }
+    }
+
+    private void GetData(PlannerTask plannerTask)
+    {
+        plannerTask.Title = taskTitle;
+        plannerTask.Description = taskDescription;
+    }
+
+    private async Task Delete(PlannerTask plannerTask)
+    {
+        CurrentElement.DeleteOrEdit = true;
+        var result = await DialogService.Show<AcceptDialog>($"Вы уверены, что хотите удалить эту задачу?").Result;
+
+        if (!result.Canceled)
+        {
+            Context.PlannerTasks.Remove(plannerTask);
+            Context.SaveChanges();
+            Snackbar.Add("Задача успешно удалена!", Severity.Success, config => { config.ShowCloseIcon = false; });
+            Update();
+        }
+    }
+
+    private void OpenAddDialog()
+    {
+        GetNull();
+        visible = true;
+    }
+
+    private void GetNull()
+    {
+        taskTitle = "";
+        taskDescription = "";
+    }
+
+    private void Add()
+    {
+        var newTask = new PlannerTask();
+
+        if (taskTitle == "")
+        {
+            taskTitle = "Без названия";
+        }
+
+        if (CurrentElement.CurrentRole == "Администратор")
+        {
+            newTask = new PlannerTask()
+                {
+                    Title = taskTitle,
+                    Description = taskDescription,
+                    Date = DateTime.Today,
+                    IsFixed = false,
+                    IsDone = false,
+                    IsManagementFixed = true
+                };
+        }
+        else
+        {
+            newTask = new PlannerTask()
+                {
+                    Title = taskTitle,
+                    Description = taskDescription,
+                    Date = DateTime.Today,
+                    IsFixed = false,
+                    IsDone = false,
+                    IsManagementFixed = false
+                };
+        }
+
+        Context.PlannerTasks.Add(newTask);
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+
+        Snackbar.Add("Задача успешно добавлена!", Severity.Success, config => { config.ShowCloseIcon = false; });
+        visible = false;
+        GetNull();
+        Update();
+    }
 }
