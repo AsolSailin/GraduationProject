@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GraduationProject.Services;
+using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 
 namespace GraduationProject.DataBase;
@@ -24,4 +26,12 @@ public partial class Aviary
     public virtual ICollection<Report> Reports { get; set; } = new List<Report>();
 
     public virtual TypeAviary Type { get; set; } = null!;
+
+
+    public void GeneratePDF(GraduationProjectContext context, IJSRuntime iJSRuntime, List<Aviary> aviaries, double[] data, string[] labels, Role currentRole, User currentUser, Report currentReport)
+    {
+        ReportService reportService = new ReportService();
+        iJSRuntime.InvokeAsync<Animal>(
+            "saveAsFile", "AnimalList.pdf", Convert.ToBase64String(reportService.CreateReport(context, aviaries, data, labels, currentRole, currentUser, currentReport)));
+    }
 }

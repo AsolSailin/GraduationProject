@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using GraduationProject.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Syncfusion.Blazor;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<CurrentElementService>();
 builder.Services.AddSingleton<FileSystemService>();
-builder.Services.AddSyncfusionBlazor();
+builder.Services.AddSingleton<ReportService>();
 
 //To create SystemPages
 builder.Services.Configure<RazorPagesOptions>(options => options.RootDirectory = "/Pages/SystemPages");
