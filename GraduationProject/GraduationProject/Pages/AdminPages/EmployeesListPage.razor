@@ -283,16 +283,6 @@
         var crntRole = Context.Roles.FirstOrDefault(x => x.Title == employeeRole).Id;
         var crntGender = Context.PersonGenders.FirstOrDefault(x => x.Title == gender).Id;
 
-        var newPassport = new Passport()
-        {
-                PassportNumber = int.Parse(number),
-                PassportSeries = int.Parse(series),
-                IssuePlace = issuedPlace,
-                IssueDate = issueDate,
-                DivissionCode = int.Parse(divissionCode),
-                PassportTypeId = Context.PassportTypes.FirstOrDefault(x => x.Title == identityDoc).Id,
-        };
-
         var newUser = new User()
             {
                 Surname = employeeSurname,
@@ -301,7 +291,6 @@
                 RoleId = crntRole,
                 BirthDate = birthDate,
                 GenderId = crntGender,
-                PassportId = newPassport.PassportNumber,
                 IsDeleted = false
             };
 

@@ -97,37 +97,6 @@
                 <MudText Class="labelText">Отчество</MudText>
                 <input @bind-value="employeePatronymic" readonly="@edit" />
             </div>
-            <br />
-            <div>
-                <MudText Class="labelText">@identityDoc</MudText>
-            </div>
-            <div>
-                <MudText Class="labelText">Серия<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="series" readonly="@edit" />
-            </div>
-            <div>
-                <MudText Class="labelText">Номер<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="number" readonly="@edit" />
-            </div>
-            <div>
-                <MudText Class="labelText">Кем выдан<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="issuePlace" readonly="@edit" />
-            </div>
-            <div>
-                <MudText Class="labelText">Код подразделения<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="divissionCode" />
-            </div>
-            <div>
-                <MudText Class="labelText">Дата выдачи<span style="visibility: @visible"> *</span></MudText>
-                @if (edit)
-                {
-                        <input @bind-value="issueDateStr" readonly="@edit" />
-                }
-                else
-                {
-                        <MudDatePicker @bind-Date="issueDate" DisableToolbar="true" Style="width: 395px; margin-left: 10px;" />
-                }
-            </div>
             <div>
                 <MudText Class="labelText">Дата рождения<span style="visibility: @visible"> *</span></MudText>
                 @if (edit)
@@ -183,23 +152,15 @@
     private List<PersonGender> genders = new List<PersonGender>();
 
     private User currentUser = new User();
-    private Passport currentPassport = new Passport();
 
-    private DateTime? issueDate = DateTime.Today;
     private DateTime? birthDate = DateTime.Today.AddYears(-18);
 
-    private string? issueDateStr = "";
     private string? birthDateStr = "";
 
     private string? employeeSurname = "";
     private string? employeeName = "";
     private string? employeePatronymic = "";
     private string? employeeRole = "";
-    private string? identityDoc = "";
-    private string? series = "";
-    private string? number = "";
-    private string? issuePlace = "";
-    private string? divissionCode = "";
     private string? gender = "";
     private string? imagePath = "";
 
@@ -210,7 +171,6 @@
     protected override void OnInitialized()
     {
         currentUser = Context.Users.FirstOrDefault(x => x.Id == int.Parse(currentEmployeeId));
-        currentPassport = Context.Passports.FirstOrDefault(x => x.PassportNumber == currentUser.PassportId);
         roles = Context.Roles.ToList();
         genders = Context.PersonGenders.ToList();
 
@@ -229,13 +189,6 @@
         employeeName = currentUser.Name;
         employeePatronymic = currentUser.Patronymic;
         employeeRole = Context.Roles.FirstOrDefault(x => x.Id == currentUser.RoleId).Title;
-        identityDoc = Context.PassportTypes.FirstOrDefault(x => x.Id == currentPassport.PassportTypeId).Title;
-        series = (currentPassport.PassportSeries).ToString();
-        number = (currentPassport.PassportNumber).ToString();
-        issueDate = currentPassport.IssueDate;
-        birthDate = currentUser.BirthDate;
-        issuePlace = currentPassport.IssuePlace;
-        divissionCode = currentPassport.DivissionCode.ToString();
         gender = Context.PersonGenders.FirstOrDefault(x => x.Id == currentUser.GenderId).Title;
     }
 
@@ -247,12 +200,6 @@
         currentUser.BirthDate = birthDate;
         currentUser.GenderId = Context.PersonGenders.FirstOrDefault(x => x.Title == gender).Id;
         currentUser.RoleId = Context.Roles.FirstOrDefault(x => x.Title == employeeRole).Id;
-        currentPassport.PassportTypeId = Context.PassportTypes.FirstOrDefault(x => x.Title == identityDoc).Id;
-        currentPassport.PassportSeries = int.Parse(series);
-        currentPassport.PassportNumber = int.Parse(number);
-        currentPassport.IssueDate = issueDate;
-        currentPassport.IssuePlace = issuePlace;
-        currentPassport.DivissionCode = int.Parse(divissionCode);
     }
 
     private async Task Delete()
@@ -290,7 +237,6 @@
         else year = "лет";
 
         birthDateStr = $"{currentUser.BirthDate.Value.ToString("d")} ({age.ToString()} {year})";
-        issueDateStr = currentPassport.IssueDate.Value.ToString("d");
     }
 
     private void Edit()
@@ -298,50 +244,15 @@
         if (employeeSurname == "" ||
         employeeName == "" ||
         employeeRole == "" ||
-        identityDoc == "" ||
-        series == "" ||
-        number == "" ||
-        issuePlace == "" ||
-        divissionCode == "" ||
         gender == "")
         {
             Snackbar.Add("Для изменения данных сотрудника все обязательные поля должны быть заполнены!", Severity.Error, config => { config.ShowCloseIcon = false; });
             return;
         }
 
-        if (!StringIsDigits(series) || !StringIsDigits(number) || !StringIsDigits(divissionCode))
+        if (birthDate > DateTime.Today.AddYears(-18))
         {
-            if (!StringIsDigits(series))
-                Snackbar.Add("Серия должна состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-
-            if (!StringIsDigits(number))
-                Snackbar.Add("Номер должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-
-            if (!StringIsDigits(divissionCode))
-                Snackbar.Add("Код подразделения должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
-
-            return;
-        }
-
-        if (series.Length > 4 || series.Length < 4 ||
-            number.Length > 6 || number.Length < 6 ||
-            divissionCode.Length > 6 || divissionCode.Length < 6)
-        {
-            if (series.Length > 4 || series.Length < 4)
-                Snackbar.Add("Серия должна состоять из 4 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
-            if (number.Length > 6 || number.Length < 6)
-                Snackbar.Add("Номер должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
-            if (divissionCode.Length > 6 || divissionCode.Length < 6)
-                Snackbar.Add("Код подразделения должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
-            
-            return;
-        }
-
-        if (birthDate > DateTime.Today.AddYears(-18) || issueDate > DateTime.Today)
-        {
-            Snackbar.Add("Даты заполнены некорректно!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            Snackbar.Add("Дата заполнена некорректно!", Severity.Error, config => { config.ShowCloseIcon = false; });
             return;
         }
 

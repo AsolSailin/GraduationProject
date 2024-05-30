@@ -39,10 +39,6 @@ public partial class GraduationProjectContext : DbContext
 
     public virtual DbSet<DiseaseType> DiseaseTypes { get; set; }
 
-    public virtual DbSet<Kid> Kids { get; set; }
-
-    public virtual DbSet<MaritalStatus> MaritalStatuses { get; set; }
-
     public virtual DbSet<MaterialSupplier> MaterialSuppliers { get; set; }
 
     public virtual DbSet<MaterialType> MaterialTypes { get; set; }
@@ -58,10 +54,6 @@ public partial class GraduationProjectContext : DbContext
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderStatus> OrderStatuses { get; set; }
-
-    public virtual DbSet<Passport> Passports { get; set; }
-
-    public virtual DbSet<PassportType> PassportTypes { get; set; }
 
     public virtual DbSet<PersonGender> PersonGenders { get; set; }
 
@@ -287,31 +279,6 @@ public partial class GraduationProjectContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Kid>(entity =>
-        {
-            entity.ToTable("Kid");
-
-            entity.Property(e => e.BirthDate).HasColumnType("date");
-            entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Patronymic)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Surname)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<MaritalStatus>(entity =>
-        {
-            entity.ToTable("MaritalStatus");
-
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
-
         modelBuilder.Entity<MaterialSupplier>(entity =>
         {
             entity.ToTable("Material_Supplier");
@@ -416,32 +383,6 @@ public partial class GraduationProjectContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Passport>(entity =>
-        {
-            entity.HasKey(e => e.PassportNumber);
-
-            entity.ToTable("Passport");
-
-            entity.Property(e => e.IssueDate).HasColumnType("date");
-            entity.Property(e => e.IssuePlace)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.PassportTypeId).HasColumnName("PassportType_Id");
-
-            entity.HasOne(d => d.PassportType).WithMany(p => p.Passports)
-                .HasForeignKey(d => d.PassportTypeId)
-                .HasConstraintName("FK_Passport_PassportType");
-        });
-
-        modelBuilder.Entity<PassportType>(entity =>
-        {
-            entity.ToTable("PassportType");
-
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
-
         modelBuilder.Entity<PersonGender>(entity =>
         {
             entity.ToTable("PersonGender");
@@ -519,24 +460,15 @@ public partial class GraduationProjectContext : DbContext
 
             entity.Property(e => e.BinaryImage).HasColumnType("image");
             entity.Property(e => e.BirthDate).HasColumnType("date");
-            entity.Property(e => e.BirthPlace)
-                .HasMaxLength(200)
-                .IsUnicode(false);
             entity.Property(e => e.GenderId).HasColumnName("Gender_Id");
             entity.Property(e => e.Image)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.KidId).HasColumnName("Kid_Id");
-            entity.Property(e => e.MaritalStatusId).HasColumnName("MaritalStatus_Id");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.PassportId).HasColumnName("Passport_Id");
             entity.Property(e => e.Patronymic)
                 .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Registration)
-                .HasMaxLength(200)
                 .IsUnicode(false);
             entity.Property(e => e.RoleId).HasColumnName("Role_Id");
             entity.Property(e => e.Surname)
@@ -546,18 +478,6 @@ public partial class GraduationProjectContext : DbContext
             entity.HasOne(d => d.Gender).WithMany(p => p.Users)
                 .HasForeignKey(d => d.GenderId)
                 .HasConstraintName("FK_User_PersonGender");
-
-            entity.HasOne(d => d.Kid).WithMany(p => p.Users)
-                .HasForeignKey(d => d.KidId)
-                .HasConstraintName("FK_User_Kid");
-
-            entity.HasOne(d => d.MaritalStatus).WithMany(p => p.Users)
-                .HasForeignKey(d => d.MaritalStatusId)
-                .HasConstraintName("FK_User_MaritalStatus");
-
-            entity.HasOne(d => d.Passport).WithMany(p => p.Users)
-                .HasForeignKey(d => d.PassportId)
-                .HasConstraintName("FK_User_Passport");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
