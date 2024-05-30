@@ -70,7 +70,7 @@
         <div>
             <p Class="mainLabel" style="text-decoration: underline;">Отчет №@currentReportId</p>
             <p Class="mainLabel" style="font-size: 20px; margin-bottom: 30px;">за @currentReport.Date.ToString("d")</p>
-            @if (!currentReport.IsAccepted)
+            @if (!currentReport.IsAccepted || currentRole.Title == "Администратор")
             {
                 <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F;" Class="d-flex mx-auto" OnClick="GetAccept">Принять отчет</MudButton>
             }
@@ -156,7 +156,7 @@
             }
         </div>
         <MudText style="font-size: 20px; margin-left: 50px; margin-top: 10px;">@currentReport.Description</MudText>
-        <MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px; margin-left: 50px; margin-bottom: 10px;" Variant="Variant.Outlined" OnClick="GetDoc">Скачать PDF-файл</MudButton>
+        <MudButton Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; margin-left: 50px; margin-bottom: 10px;" Variant="Variant.Outlined" OnClick="GetDoc">Скачать PDF-файл</MudButton>
     </div>
 </MudPaper>
 

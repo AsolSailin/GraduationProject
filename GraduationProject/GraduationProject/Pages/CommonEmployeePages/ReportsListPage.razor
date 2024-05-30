@@ -89,7 +89,7 @@ else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.Ro
     <MudPaper Class="paper">
         <MudText Class="mainLabelText">Мои отчеты</MudText>
         <div>
-            <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F; width: 25%; margin-top: 30px;" Class="d-flex mx-auto">Оформить отчет</MudButton>
+            <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F; width: 25%; margin-top: 30px;" Class="d-flex mx-auto" OnClick="GetReportReg">Оформить отчет</MudButton>
         </div>
         <div class="mainBlock">
             <div class="tableBlock" style="overflow: scroll; height: 379px; width: 700px; margin-left: auto; margin-right: auto;">
@@ -137,6 +137,7 @@ else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.Ro
     }
 
     private void GetReport() => Navigation.NavigateTo($"/report_page/{selectedItem.Id}");
+    private void GetReportReg() => Navigation.NavigateTo($"/report_registration");
 
     private void GetReportRegistration() => Navigation.NavigateTo($"/report_registration");
 
@@ -146,7 +147,7 @@ else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.Ro
         {
             reportsList = Context.Reports.Where(x => x.Date == date).ToList();
         }
-        else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Кладовщик")
+        else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Кипер")
         {
             wReportsList = Context.Reports.Where(x => x.UserId == CurrentElement.CurrentUser.Id).ToList();
         }

@@ -58,7 +58,7 @@
 <MudPaper Class="paper">
     <MudText Class="mainLabelText">Планировщик задач</MudText>
     <div style="margin-left: auto; margin-right: auto; text-align: center;">
-        <MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px; " Variant="Variant.Outlined" OnClick="OpenAddDialog">Добавить задачу</MudButton>
+        <MudButton Style="font-size: 16px;  border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; " Variant="Variant.Outlined" OnClick="OpenAddDialog">Добавить задачу</MudButton>
     </div>
     <hr />
     <div class="tableBlock" style="overflow: scroll; height: 379px;  margin-left: auto; margin-right: auto;">
@@ -81,15 +81,18 @@
                 <MudTd DataLabel="IsDone"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsDone)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 1)"></MudCheckBox></MudTd>
                 <MudTd DataLabel="Title">@context.Title</MudTd>
                 <MudTd DataLabel="Date">@GetShortDate(context.Date)</MudTd>
-                <MudTd DataLabel="Description" Style="text-align: center"><MudTooltip Text="@context.Description"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined">Описание</MudButton></MudTooltip></MudTd>
-                <MudTd DataLabel="Edit" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => GetEdit(context))">Изменить</MudButton></MudTd>
-                <MudTd DataLabel="Delete" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #658dc3; color: #658dc3; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => Delete(context))">Удалить</MudButton></MudTd>
+                <MudTd DataLabel="Description" Style="text-align: center"><MudTooltip Text="@context.Description"><MudButton Style="font-size: 16px; border: 2px solid #21A77F; color: #21A77F; border-radius: 10px;" Variant="Variant.Outlined">Описание</MudButton></MudTooltip></MudTd>
+                
                 @if (context.IsManagementFixed ?? false)
                 {
+                    <MudTd DataLabel="IsManagementFixed" Style="text-align: center">---</MudTd>
+                    <MudTd DataLabel="IsManagementFixed" Style="text-align: center">---</MudTd>
                     <MudTd DataLabel="IsManagementFixed">закреплено</MudTd>
                 }
                 else
                 {
+                    <MudTd DataLabel="Edit" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #21A77F; color: #21A77F; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => GetEdit(context))">Изменить</MudButton></MudTd>
+                    <MudTd DataLabel="Delete" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #21A77F; color: #21A77F; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => Delete(context))">Удалить</MudButton></MudTd>
                     <MudTd DataLabel="IsFixed"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsFixed)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 2)"></MudCheckBox></MudTd>
                 }
             </RowTemplate>

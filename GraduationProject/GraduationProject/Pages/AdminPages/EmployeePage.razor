@@ -83,6 +83,9 @@
         </div>
         <div class="fieldsBlock">
             <div>
+                <MudText Class="labelText">Личные данные</MudText>
+            </div>
+            <div>
                 <MudText Class="labelText">Фамилия<span style="visibility: @visible"> *</span></MudText>
                 <input @bind-value="employeeSurname" readonly="@edit" />
             </div>
@@ -94,6 +97,7 @@
                 <MudText Class="labelText">Отчество</MudText>
                 <input @bind-value="employeePatronymic" readonly="@edit" />
             </div>
+            <br />
             <div>
                 <MudText Class="labelText">@identityDoc</MudText>
             </div>
@@ -184,20 +188,20 @@
     private DateTime? issueDate = DateTime.Today;
     private DateTime? birthDate = DateTime.Today.AddYears(-18);
 
-    private string issueDateStr = "";
-    private string birthDateStr = "";
+    private string? issueDateStr = "";
+    private string? birthDateStr = "";
 
-    private string employeeSurname = "";
-    private string employeeName = "";
-    private string employeePatronymic = "";
-    private string employeeRole = "";
-    private string identityDoc = "";
-    private string series = "";
-    private string number = "";
-    private string issuePlace = "";
-    private string divissionCode = "";
-    private string gender = "";
-    private string imagePath = "";
+    private string? employeeSurname = "";
+    private string? employeeName = "";
+    private string? employeePatronymic = "";
+    private string? employeeRole = "";
+    private string? identityDoc = "";
+    private string? series = "";
+    private string? number = "";
+    private string? issuePlace = "";
+    private string? divissionCode = "";
+    private string? gender = "";
+    private string? imagePath = "";
 
     private string visible = "hidden";
 

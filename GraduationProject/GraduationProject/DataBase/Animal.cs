@@ -1,6 +1,4 @@
-﻿using GraduationProject.Services;
-using Microsoft.JSInterop;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GraduationProject.DataBase;

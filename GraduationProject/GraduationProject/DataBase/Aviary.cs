@@ -27,7 +27,6 @@ public partial class Aviary
 
     public virtual TypeAviary Type { get; set; } = null!;
 
-
     public void GeneratePDF(GraduationProjectContext context, IJSRuntime iJSRuntime, List<Aviary> aviaries, double[] data, string[] labels, Role currentRole, User currentUser, Report currentReport)
     {
         ReportService reportService = new ReportService();

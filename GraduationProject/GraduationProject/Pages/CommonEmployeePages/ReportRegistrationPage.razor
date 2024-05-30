@@ -1,7 +1,10 @@
 ﻿@page "/report_registration"
 
+@using GraduationProject.DataBase
 @using GraduationProject.Services
+@inject GraduationProjectContext Context
 @inject CurrentElementService CurrentElement
+@inject ISnackbar Snackbar
 
 <style>
     .paper {
@@ -10,14 +13,58 @@
         top: 100px;
         width: 1000px;
         height: 550px;
-        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;  
         background-color: #EEFFF7;
-        border-radius: 30px;
+    }
+
+    .mainLabel {
+        text-align: center;
+        margin-right: auto;
+        margin-left: auto;
+        font-size: 50px;
+        font-weight: 500;
+        color: #21A77F;
+        font-family: Andale Mono, monospace;
+    }
+
+    .labelText {
+        font-size: 25px;
+        font-weight: 500;
+        color: #21A77F;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        margin-left: 7px;
+    }
+
+    .fieldsBlock {
+        flex: 50%;
+        margin-bottom: 30px;
+        margin-right: 30px;
+    }
+
+    .listBlock {
+        flex: 50%;
+        text-align: center;
+        margin-left: 50px;
+        width: 400px;
+        height: 400px;
+    }
+
+    .main {
+        height: 100%;
+        margin-left: 50px;
+        margin-top: 10px;
+        margin-bottom: 3    0px;
+        margin-right: auto;
+        overflow-y: scroll;
     }
 </style>
 
 <MudPaper Class="paper">
-    <div class="mainblock">
+    <div class="main">
+        <div>
+            <MudText Class="labelText">БЛОК ЛИЧНЫХ ДАННЫХ</MudText>
+        </div>
         <div>
             <MudText Class="labelText">Фамилия</MudText>
             <input @bind-value="CurrentElement.CurrentUser.Surname" />
@@ -30,9 +77,100 @@
             <MudText Class="labelText">Отчество</MudText>
             <input @bind-value="CurrentElement.CurrentUser.Patronymic" />
         </div>
+        <br />
+        <div>
+            <MudText Class="labelText">БЛОК ОТЧЕТНЫХ ДАННЫХ</MudText>
+        </div>
+        <table>
+            <tr><th>
+                    <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetAnimals" Value="aviary" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                        @foreach (var a in aviaries)
+                    {
+                                    <MudSelectItem Value="@(a.Title)" />
+                    }
+                </MudSelect></th><th>
+                <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetAnimal" Value="animal" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                    @foreach (var a in animals)
+                    {
+                                <MudSelectItem Value="@(a.Name)" />
+                    }
+                </MudSelect></th><th>
+                    <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetMaterial" Value="material" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; width: 200px">
+                    @foreach (var m in materials)
+                    {
+                                <MudSelectItem Value="@(m.Title)" />
+                    }
+                </MudSelect>
+            </th>
+                <th><input style="font-size: 16px; height: 60px; width: 100px" @bind-value="materialValue" /></th>
+            </tr>
+            <br />
+            <tr><th><MudText Class="labelText" >Описание:</MudText></th><th><input @bind-value="description" /></th></tr>
+        </table>
+        <br />
+        <MudButton Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; margin-left: 10px; margin-bottom: 10px;" Variant="Variant.Outlined" OnClick="GetReport">Сформировать отчет</MudButton>
+        <br />
     </div>
 </MudPaper>
 
 @code {
+    private string materialValue = "Количество";
+    private string description;
 
+    private List<Aviary> aviaries = new List<Aviary>();
+    private string aviary = "Вид животного (вольер)";
+    private List<Animal> animals = new List<Animal>();
+    private string animal = "Имя животного";
+    private List<CareMaterial> materials = new List<CareMaterial>();
+    private string material = "Материалы";
+
+    protected override async Task OnInitializedAsync()
+    {
+        aviaries = Context.Aviaries.ToList();
+        materials = Context.CareMaterials.Where(x => x.Id == 1 || x.Id == 2 || x.Id == 3 || x.Id == 4 ||
+                           x.Id == 5 || x.Id == 6 || x.Id == 7).ToList();
+
+    }        
+
+    private void GetReport()
+    {
+        var newReport = new Report()
+            {
+                Date = DateTime.Now,
+                UserId = CurrentElement.CurrentUser.Id,
+                AviaryId = Context.Aviaries.FirstOrDefault(x => x.Title == aviary).Id,
+                Description = description
+            };
+
+        var newAnimalMaterial = new AnimalMaterial()
+        {
+                AnimalId = Context.Animals.FirstOrDefault(x => x.Name == animal).Id,
+                MaterialId = Context.CareMaterials.FirstOrDefault(x => x.Title == material).Id,
+                Date = DateTime.Now,
+        };
+
+        Context.Reports.Add(newReport);
+        Context.AnimalMaterials.Add(newAnimalMaterial);
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+
+        Snackbar.Add("Информация отчета успешно добавлена!", Severity.Success, config => { config.ShowCloseIcon = false; });
+    }
+
+    private void GetAnimals(string selected)
+    {
+        aviary = selected;
+        var a = Context.Aviaries.FirstOrDefault(x => x.Title == selected);
+        animals = Context.Animals.Where(x => x.AviaryId == a.Id).ToList();
+    }
+
+    private void GetAnimal(string selected)
+    {
+        animal = selected;
+    }
+
+    private void GetMaterial(string selected)
+    {
+        material = selected;
+    }
 }
