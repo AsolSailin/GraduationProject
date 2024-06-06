@@ -15,8 +15,6 @@ public partial class PlannerTask
 
     public bool? IsDone { get; set; }
 
-    public bool? IsManagementFixed { get; set; }
-
     public DateTime? Date { get; set; }
 
     public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();

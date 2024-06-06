@@ -57,9 +57,18 @@
 
 <MudPaper Class="paper">
     <MudText Class="mainLabelText">Планировщик задач</MudText>
-    <div style="margin-left: auto; margin-right: auto; text-align: center;">
-        <MudButton Style="font-size: 16px;  border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; " Variant="Variant.Outlined" OnClick="OpenAddDialog">Добавить задачу</MudButton>
-    </div>
+    @if (CurrentElement.CurrentRole == "Администратор")
+    {
+        <div style="margin-left: auto; margin-right: auto; text-align: center;">
+            <MudButton Style="font-size: 16px;  border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; " Variant="Variant.Outlined" OnClick="OpenAddDialog">Добавить задачу</MudButton>
+            <MudSelect T="string" Label="Должность" Variant="Variant.Outlined" ValueChanged="GetRole" Value="currentRole" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                @foreach (var role in rolesFilt)
+                {
+                    <MudSelectItem Value="@(role.Title)" />
+                }
+            </MudSelect>
+        </div>
+    }
     <hr />
     <div class="tableBlock" style="overflow: scroll; height: 379px;  margin-left: auto; margin-right: auto;">
         <MudTable Items="@Elements.Take(10)" Dense="true" @bind-SelectedItems="selectedItems" @bind-SelectedItem="selectedItem" @bind-SelectOnRowClick="@_selectOnRowClick" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true" Bordered="true"
@@ -68,31 +77,41 @@
                 <MudTHeadRow IgnoreCheckbox="true" Class="header-centered">
                 </MudTHeadRow>
                 <MudTHeadRow IsCheckable="true">
-                    <MudTh></MudTh>
+                    @if (CurrentElement.CurrentRole != "Администратор")
+                    {
+                        <MudTh></MudTh>
+                    }
                     <MudTh>Название</MudTh>
                     <MudTh>Дата</MudTh>
                     <MudTh>Описание</MudTh>
-                    <MudTh>Изменение</MudTh>
-                    <MudTh>Удаление</MudTh>
-                    <MudTh>Закрепление</MudTh>
+                    @if (CurrentElement.CurrentRole == "Администратор")
+                    {
+                        <MudTh>Изменение</MudTh>
+                        <MudTh>Удаление</MudTh>                        
+                        <MudTh>Должность</MudTh>                        
+                    }
+                    else
+                    {
+                        <MudTh>Закрепление</MudTh>
+                    }
                 </MudTHeadRow>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="IsDone"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsDone)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 1)"></MudCheckBox></MudTd>
+                @if (CurrentElement.CurrentRole != "Администратор")
+                { 
+                    <MudTd DataLabel="IsDone"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsDone)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 1)"></MudCheckBox></MudTd>
+                }
                 <MudTd DataLabel="Title">@context.Title</MudTd>
                 <MudTd DataLabel="Date">@GetShortDate(context.Date)</MudTd>
                 <MudTd DataLabel="Description" Style="text-align: center"><MudTooltip Text="@context.Description"><MudButton Style="font-size: 16px; border: 2px solid #21A77F; color: #21A77F; border-radius: 10px;" Variant="Variant.Outlined">Описание</MudButton></MudTooltip></MudTd>
-                
-                @if (context.IsManagementFixed ?? false)
-                {
-                    <MudTd DataLabel="IsManagementFixed" Style="text-align: center">---</MudTd>
-                    <MudTd DataLabel="IsManagementFixed" Style="text-align: center">---</MudTd>
-                    <MudTd DataLabel="IsManagementFixed">закреплено</MudTd>
-                }
-                else
+                @if (CurrentElement.CurrentRole == "Администратор")
                 {
                     <MudTd DataLabel="Edit" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #21A77F; color: #21A77F; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => GetEdit(context))">Изменить</MudButton></MudTd>
                     <MudTd DataLabel="Delete" Style="text-align: center"><MudButton Style="font-size: 16px; border: 2px solid #21A77F; color: #21A77F; border-radius: 10px;" Variant="Variant.Outlined" OnClick="@(() => Delete(context))">Удалить</MudButton></MudTd>
+                    <MudTd DataLabel="Title">@GetTaskRole(context)</MudTd>
+                }
+                else
+                {
                     <MudTd DataLabel="IsFixed"><MudCheckBox Style="color: #658dc3;" Checked="BoolActive(context.IsFixed)" Class="d-flex mx-auto" @onclick="() => ToCheck(context, 2)"></MudCheckBox></MudTd>
                 }
             </RowTemplate>
@@ -119,6 +138,15 @@
         <div class="mainblock">
             <div class="fieldsBlock">
                 <div>
+                    <MudText Class="labelText">Должность</MudText>
+                    <MudSelect T="string" Label="Должность" Variant="Variant.Outlined" ValueChanged="DialogGetRole" Value="dialogCurrentRole" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                        @foreach (var role in rolesFilt)
+                        {
+                            <MudSelectItem Value="@(role.Title)" />
+                        }
+                    </MudSelect>
+                </div>
+                <div>
                     <MudText Class="labelText">Название</MudText>
                     <input @bind-value="taskTitle" />
                 </div>
@@ -144,6 +172,8 @@
 </MudPaper>
 
 @code {
+    private List<PlannerTask> ElementsOne = new List<PlannerTask>();
+    private List<PlannerTask> ElementsTwo = new List<PlannerTask>();
     private List<PlannerTask> Elements = new List<PlannerTask>();
     private PlannerTask selectedItem = new PlannerTask();
     private HashSet<PlannerTask> selectedItems = new HashSet<PlannerTask>();
@@ -156,18 +186,84 @@
     private string taskDescription = "";
     private DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
     private PlannerTask currentTask = new PlannerTask();
+    private List<Role> rolesFilt = new List<Role>();
+    private static readonly Role _allRoles = new Role() { Title = "Все" };
+    private string currentRole = "Все";
+    private string dialogCurrentRole = "";
+    private List<User> dialogCurrentUserList = new List<User>();
 
     protected override void OnInitialized()
     {
+        rolesFilt = Context.Roles.Where(x => x.Title != "Администратор").ToList();
+        rolesFilt.Add(_allRoles);
         Update();
     }
 
     public void Update()
     {
+        ElementsOne.Clear();
+        ElementsTwo.Clear();
         Elements.Clear();
-        Elements.AddRange(Context.PlannerTasks.Where(x => x.IsManagementFixed == true).ToList());
-        Elements.AddRange(Context.PlannerTasks.Where(x => x.IsFixed == true).ToList());
-        Elements.AddRange(Context.PlannerTasks.Where(x => x.IsManagementFixed != true && x.IsFixed != true).ToList());
+        if (CurrentElement.CurrentRole == "Администратор")
+        {
+            Elements.AddRange(Context.PlannerTasks.ToList());
+            Elements.Reverse();
+        }
+        else
+        {
+            var userTask = Context.UserTasks.Where(x => x.UserId == CurrentElement.CurrentUser.Id).ToList();
+
+            foreach (var ut in userTask)
+            {
+                ElementsOne.AddRange(Context.PlannerTasks.Where(x => x.Id == ut.TaskId && x.IsFixed == true));
+            }
+            ElementsOne.Reverse();
+
+            foreach (var ut in userTask)
+            {
+                ElementsTwo.AddRange(Context.PlannerTasks.Where(x => x.Id == ut.TaskId && x.IsFixed != true));
+            }
+            ElementsTwo.Reverse();
+            Elements.AddRange(ElementsOne);
+            Elements.AddRange(ElementsTwo);
+        }
+    }
+
+    private void GetRole(string selected)
+    {
+        currentRole = selected;
+
+        if (currentRole == "Все")
+        {
+            Update();
+            return;
+        }
+
+        Elements.Clear();
+        var roleId = Context.Roles.FirstOrDefault(x => x.Title == currentRole).Id;
+        var userId = Context.Users.FirstOrDefault(x => x.RoleId == roleId).Id;
+        var tasks = Context.UserTasks.Where(x => x.UserId == userId).ToList();
+
+        foreach (var t in tasks)
+        {
+            Elements.AddRange(Context.PlannerTasks.Where(x => x.Id == t.TaskId).ToList());
+        }
+
+        Elements.Reverse();
+    }
+
+    private void DialogGetRole(string selected)
+    {
+        dialogCurrentRole = selected;
+        var roleId = Context.Roles.FirstOrDefault(x => x.Title == dialogCurrentRole).Id;
+        dialogCurrentUserList = Context.Users.Where(x => x.RoleId == roleId).ToList();
+    }
+
+    private string GetTaskRole(PlannerTask plannerTask)
+    {
+        var userTask = Context.UserTasks.FirstOrDefault(x => x.TaskId == plannerTask.Id);
+        var user = Context.Users.FirstOrDefault(x => x.Id == userTask.UserId);
+        return Context.Roles.FirstOrDefault(x => x.Id == user.Id).Title;
     }
 
     String GetShortDate(DateTime? dateTime)
@@ -273,39 +369,39 @@
 
     private void Add()
     {
-        var newTask = new PlannerTask();
+        if (dialogCurrentRole == "")
+        {
+            Snackbar.Add("Для добавления задачи необходимо выбрать должность сотрудника!!", Severity.Error, config => { config.ShowCloseIcon = false; });
+            return;
+        }
 
         if (taskTitle == "")
         {
             taskTitle = "Без названия";
         }
 
-        if (CurrentElement.CurrentRole == "Администратор")
-        {
-            newTask = new PlannerTask()
-                {
-                    Title = taskTitle,
-                    Description = taskDescription,
-                    Date = DateTime.Today,
-                    IsFixed = false,
-                    IsDone = false,
-                    IsManagementFixed = true
-                };
-        }
-        else
-        {
-            newTask = new PlannerTask()
-                {
-                    Title = taskTitle,
-                    Description = taskDescription,
-                    Date = DateTime.Today,
-                    IsFixed = false,
-                    IsDone = false,
-                    IsManagementFixed = false
-                };
-        }
+        var newTask = new PlannerTask()
+            {
+                Title = taskTitle,
+                Description = taskDescription,
+                Date = DateTime.Today,
+                IsFixed = false,
+                IsDone = false
+            };
 
         Context.PlannerTasks.Add(newTask);
+        Context.SaveChanges();
+
+        foreach(var d in dialogCurrentUserList)
+        {
+            var newUserTask = new UserTask()
+                {
+                    UserId = d.Id,
+                    Task = newTask
+                };
+            Context.UserTasks.Add(newUserTask);
+        }
+        
         Context.SaveChanges();
         Context.ChangeTracker.Clear();
 
