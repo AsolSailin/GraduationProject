@@ -142,7 +142,7 @@
                 Description = description
             };
 
-        var newAnimalMaterial = new AnimalMaterial()
+        var newMaterialApplications = new MaterialApplication()
         {
                 AnimalId = Context.Animals.FirstOrDefault(x => x.Name == animal).Id,
                 MaterialId = Context.CareMaterials.FirstOrDefault(x => x.Title == material).Id,
@@ -150,7 +150,7 @@
         };
 
         Context.Reports.Add(newReport);
-        Context.AnimalMaterials.Add(newAnimalMaterial);
+        Context.MaterialApplications.Add(newMaterialApplications);
         Context.SaveChanges();
         Context.ChangeTracker.Clear();
 

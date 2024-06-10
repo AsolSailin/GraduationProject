@@ -29,8 +29,8 @@ public partial class Aviary
 
     public void GeneratePDF(GraduationProjectContext context, IJSRuntime iJSRuntime, List<Aviary> aviaries, double[] data, string[] labels, Role currentRole, User currentUser, Report currentReport)
     {
-        ReportService reportService = new ReportService();
+        ReportService reportService = new();
         iJSRuntime.InvokeAsync<Animal>(
-            "saveAsFile", "AnimalList.pdf", Convert.ToBase64String(reportService.CreateReport(context, aviaries, data, labels, currentRole, currentUser, currentReport)));
+            "saveAsFile", "Отчет.pdf", Convert.ToBase64String(reportService.CreateReport(context, aviaries, data, labels, currentRole, currentUser, currentReport)));
     }
 }

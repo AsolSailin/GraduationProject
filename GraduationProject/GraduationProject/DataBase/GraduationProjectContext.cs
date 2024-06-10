@@ -27,33 +27,21 @@ public partial class GraduationProjectContext : DbContext
 
     public virtual DbSet<AnimalMaterial> AnimalMaterials { get; set; }
 
-    public virtual DbSet<Aviary> Aviaries { get; set; }
+    public virtual DbSet<AnimalVaccination> AnimalVaccinations { get; set; }
 
-    public virtual DbSet<Basket> Baskets { get; set; }
+    public virtual DbSet<Aviary> Aviaries { get; set; }
 
     public virtual DbSet<CareMaterial> CareMaterials { get; set; }
 
-    public virtual DbSet<Category> Categories { get; set; }
-
     public virtual DbSet<Disease> Diseases { get; set; }
 
-    public virtual DbSet<DiseaseType> DiseaseTypes { get; set; }
-
-    public virtual DbSet<MaterialSupplier> MaterialSuppliers { get; set; }
+    public virtual DbSet<MaterialApplication> MaterialApplications { get; set; }
 
     public virtual DbSet<MaterialType> MaterialTypes { get; set; }
-
-    public virtual DbSet<Meal> Meals { get; set; }
-
-    public virtual DbSet<MealOrder> MealOrders { get; set; }
 
     public virtual DbSet<MeasurementUnit> MeasurementUnits { get; set; }
 
     public virtual DbSet<Offspring> Offspring { get; set; }
-
-    public virtual DbSet<Order> Orders { get; set; }
-
-    public virtual DbSet<OrderStatus> OrderStatuses { get; set; }
 
     public virtual DbSet<PersonGender> PersonGenders { get; set; }
 
@@ -62,8 +50,6 @@ public partial class GraduationProjectContext : DbContext
     public virtual DbSet<Report> Reports { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
-
-    public virtual DbSet<Supplier> Suppliers { get; set; }
 
     public virtual DbSet<TypeAviary> TypeAviaries { get; set; }
 
@@ -163,7 +149,6 @@ public partial class GraduationProjectContext : DbContext
             entity.ToTable("Animal_Material");
 
             entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
-            entity.Property(e => e.Date).HasColumnType("date");
             entity.Property(e => e.MaterialId).HasColumnName("Material_Id");
 
             entity.HasOne(d => d.Animal).WithMany(p => p.AnimalMaterials)
@@ -175,6 +160,22 @@ public partial class GraduationProjectContext : DbContext
                 .HasForeignKey(d => d.MaterialId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Animal_Material_CareMaterial");
+        });
+
+        modelBuilder.Entity<AnimalVaccination>(entity =>
+        {
+            entity.ToTable("Animal_Vaccination");
+
+            entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
+            entity.Property(e => e.VaccinationId).HasColumnName("Vaccination_Id");
+
+            entity.HasOne(d => d.Animal).WithMany(p => p.AnimalVaccinations)
+                .HasForeignKey(d => d.AnimalId)
+                .HasConstraintName("FK_Animal_Vaccination_Animal");
+
+            entity.HasOne(d => d.Vaccination).WithMany(p => p.AnimalVaccinations)
+                .HasForeignKey(d => d.VaccinationId)
+                .HasConstraintName("FK_Animal_Vaccination_Vaccination");
         });
 
         modelBuilder.Entity<Aviary>(entity =>
@@ -199,18 +200,6 @@ public partial class GraduationProjectContext : DbContext
                 .HasForeignKey(d => d.TypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Aviary_TypeAviary");
-        });
-
-        modelBuilder.Entity<Basket>(entity =>
-        {
-            entity.ToTable("Basket");
-
-            entity.Property(e => e.MealId).HasColumnName("Meal_Id");
-            entity.Property(e => e.UserId).HasColumnName("User_Id");
-
-            entity.HasOne(d => d.Meal).WithMany(p => p.Baskets)
-                .HasForeignKey(d => d.MealId)
-                .HasConstraintName("FK_Basket_Meal");
         });
 
         modelBuilder.Entity<CareMaterial>(entity =>
@@ -242,58 +231,32 @@ public partial class GraduationProjectContext : DbContext
                 .HasConstraintName("FK_CareMaterial_MaterialType");
         });
 
-        modelBuilder.Entity<Category>(entity =>
-        {
-            entity.ToTable("Category");
-
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
-
         modelBuilder.Entity<Disease>(entity =>
         {
             entity.ToTable("Disease");
 
-            entity.Property(e => e.DiseaseTypeId).HasColumnName("DiseaseType_Id");
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.VaccinationId).HasColumnName("Vaccination_Id");
-
-            entity.HasOne(d => d.DiseaseType).WithMany(p => p.Diseases)
-                .HasForeignKey(d => d.DiseaseTypeId)
-                .HasConstraintName("FK_Disease_DiseaseType");
-
-            entity.HasOne(d => d.Vaccination).WithMany(p => p.Diseases)
-                .HasForeignKey(d => d.VaccinationId)
-                .HasConstraintName("FK_Disease_Vaccination");
-        });
-
-        modelBuilder.Entity<DiseaseType>(entity =>
-        {
-            entity.ToTable("DiseaseType");
-
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<MaterialSupplier>(entity =>
+        modelBuilder.Entity<MaterialApplication>(entity =>
         {
-            entity.ToTable("Material_Supplier");
+            entity.ToTable("MaterialApplication");
 
+            entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
+            entity.Property(e => e.Date).HasColumnType("date");
             entity.Property(e => e.MaterialId).HasColumnName("Material_Id");
-            entity.Property(e => e.Price).HasColumnType("decimal(7, 0)");
-            entity.Property(e => e.SupplierId).HasColumnName("Supplier_Id");
 
-            entity.HasOne(d => d.Material).WithMany(p => p.MaterialSuppliers)
+            entity.HasOne(d => d.Animal).WithMany(p => p.MaterialApplications)
+                .HasForeignKey(d => d.AnimalId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MaterialApplication_Animal");
+
+            entity.HasOne(d => d.Material).WithMany(p => p.MaterialApplications)
                 .HasForeignKey(d => d.MaterialId)
-                .HasConstraintName("FK_Material_Supplier_CareMaterial");
-
-            entity.HasOne(d => d.Supplier).WithMany(p => p.MaterialSuppliers)
-                .HasForeignKey(d => d.SupplierId)
-                .HasConstraintName("FK_Material_Supplier_Supplier");
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_MaterialApplication_CareMaterial");
         });
 
         modelBuilder.Entity<MaterialType>(entity =>
@@ -303,43 +266,6 @@ public partial class GraduationProjectContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<Meal>(entity =>
-        {
-            entity.ToTable("Meal");
-
-            entity.Property(e => e.BinaryImage).HasColumnType("image");
-            entity.Property(e => e.CategoryId).HasColumnName("Category_Id");
-            entity.Property(e => e.Description)
-                .HasMaxLength(250)
-                .IsUnicode(false);
-            entity.Property(e => e.ImagePath)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Category).WithMany(p => p.Meals)
-                .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK_Meal_Category");
-        });
-
-        modelBuilder.Entity<MealOrder>(entity =>
-        {
-            entity.ToTable("Meal_Order");
-
-            entity.Property(e => e.MealId).HasColumnName("Meal_Id");
-            entity.Property(e => e.OrderId).HasColumnName("Order_Id");
-
-            entity.HasOne(d => d.Meal).WithMany(p => p.MealOrders)
-                .HasForeignKey(d => d.MealId)
-                .HasConstraintName("FK_Meal_Order_Meal");
-
-            entity.HasOne(d => d.Order).WithMany(p => p.MealOrders)
-                .HasForeignKey(d => d.OrderId)
-                .HasConstraintName("FK_Meal_Order_Order");
         });
 
         modelBuilder.Entity<MeasurementUnit>(entity =>
@@ -359,28 +285,6 @@ public partial class GraduationProjectContext : DbContext
             entity.HasOne(d => d.Animal).WithMany(p => p.Offspring)
                 .HasForeignKey(d => d.AnimalId)
                 .HasConstraintName("FK_Offspring_Animal");
-        });
-
-        modelBuilder.Entity<Order>(entity =>
-        {
-            entity.ToTable("Order");
-
-            entity.Property(e => e.ReadyTime).HasColumnType("date");
-            entity.Property(e => e.StatusId).HasColumnName("Status_Id");
-            entity.Property(e => e.UserId).HasColumnName("User_Id");
-
-            entity.HasOne(d => d.Status).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.StatusId)
-                .HasConstraintName("FK_Order_OrderStatus");
-        });
-
-        modelBuilder.Entity<OrderStatus>(entity =>
-        {
-            entity.ToTable("OrderStatus");
-
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
         });
 
         modelBuilder.Entity<PersonGender>(entity =>
@@ -430,15 +334,6 @@ public partial class GraduationProjectContext : DbContext
         modelBuilder.Entity<Role>(entity =>
         {
             entity.ToTable("Role");
-
-            entity.Property(e => e.Title)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<Supplier>(entity =>
-        {
-            entity.ToTable("Supplier");
 
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
@@ -505,8 +400,8 @@ public partial class GraduationProjectContext : DbContext
             entity.ToTable("Vaccination");
 
             entity.Property(e => e.Title)
-                .HasMaxLength(10)
-                .IsFixedLength();
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         OnModelCreatingPartial(modelBuilder);

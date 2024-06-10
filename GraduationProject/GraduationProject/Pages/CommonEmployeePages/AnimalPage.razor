@@ -92,6 +92,9 @@
         </div>
         <div class="fieldsBlock">
             <div>
+                <MudText Class="labelText">Общие данные</MudText>
+            </div>
+            <div>
                 <MudText Class="labelText">Пол<span style="visibility: @visible"> *</span></MudText>
                 @if (edit)
                 {
@@ -130,6 +133,46 @@
                     <MudDatePicker @bind-Date="animalBirthDate" DisableToolbar="true" Style="width: 395px; margin-left: 10px;margin-bottom: 50px;" />
                 }
             </div>
+            <br />
+            <div>
+                <MudText Class="labelText">Медицинская карта</MudText>
+            </div>
+            <div>
+                <MudText Class="labelText">Заболевания</MudText>
+                    <MudTable Items="@DiseaseElements.Take(5)" Dense="true" @bind-SelectedItems="selectedDiseases" @bind-SelectedItem="selectedDisease" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true" Bordered="true"
+                          CustomHeader="true" CustomFooter="true">
+                        <HeaderContent>
+                            <MudTHeadRow IgnoreCheckbox="true" Class="header-centered">
+                            </MudTHeadRow>
+                            <MudTHeadRow IsCheckable="true">
+                                <MudTh></MudTh>
+                                <MudTh></MudTh>
+                            </MudTHeadRow>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Title">@context.Title</MudTd>
+                        <MudTd DataLabel="IsCheck"><MudCheckBox Style="color: #658dc3;" Checked="DiseaseBoolActive(context)" Class="d-flex mx-auto" @onclick="() => DiseaseToCheck(context)" Disabled="@edit"></MudCheckBox></MudTd>
+                        </RowTemplate>
+                    </MudTable>
+            </div>
+            <div>
+                <MudText Class="labelText">Вакцинации</MudText>
+                <MudTable Items="@VaccinationElements.Take(5)" Dense="true" @bind-SelectedItems="selectedVaccinations" @bind-SelectedItem="selectedVaccination" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true" Bordered="true"
+                          CustomHeader="true" CustomFooter="true">
+                    <HeaderContent>
+                        <MudTHeadRow IgnoreCheckbox="true" Class="header-centered">
+                        </MudTHeadRow>
+                        <MudTHeadRow IsCheckable="true">
+                            <MudTh></MudTh>
+                            <MudTh></MudTh>
+                        </MudTHeadRow>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Title">@context.Title</MudTd>
+                        <MudTd DataLabel="IsCheck"><MudCheckBox Style="color: #658dc3;" Checked="VaccinationBoolActive(context)" Class="d-flex mx-auto" @onclick="() => VaccinationToCheck(context)" Disabled="@edit"></MudCheckBox></MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </div>
         </div>
     </div>
 </MudPaper>
@@ -140,9 +183,15 @@
 
     private List<Aviary> aviaries = new List<Aviary>();
     private List<AnimalGender> genders = new List<AnimalGender>();
+    private List<Disease> diseases = new List<Disease>();
+    private List<AnimalDisease> diseaseList = new List<AnimalDisease>();
+    private List<Vaccination> vaccinations = new List<Vaccination>();
+    private List<AnimalVaccination> vaccinationList = new List<AnimalVaccination>();
 
     private Aviary aviary = new Aviary();
     private Animal currentAnimal = new Animal();
+    private AnimalDisease currentDisease = new AnimalDisease();
+    private AnimalVaccination currentVaccination = new AnimalVaccination();
 
     private DateTime? animalBirthDate = new DateTime();
 
@@ -153,10 +202,21 @@
     private string imagePath = "";
     private string animalImage = "";
     private string gender = "";
+    private string animalNutrition = "";
+    private string animalDisease = "";
+    private string animalVaccination = "";
 
     private string visible = "hidden";
 
     private bool edit = true;
+    private bool count = true;
+
+    private List<Disease> DiseaseElements = new List<Disease>();
+    private List<Vaccination> VaccinationElements = new List<Vaccination>();
+    private Disease selectedDisease = new Disease();
+    private Vaccination selectedVaccination = new Vaccination();
+    private HashSet<Disease> selectedDiseases = new HashSet<Disease>();
+    private HashSet<Vaccination> selectedVaccinations = new HashSet<Vaccination>();
 
     protected override void OnInitialized()
     {
@@ -165,6 +225,11 @@
 
         aviaries = Context.Aviaries.ToList();
         genders = Context.AnimalGenders.ToList();
+        diseases = Context.Diseases.ToList();
+        vaccinations = Context.Vaccinations.ToList();
+
+        DiseaseElements = Context.Diseases.ToList();
+        VaccinationElements = Context.Vaccinations.ToList();
 
         GetFields();
         GetDate();
@@ -176,6 +241,54 @@
         edit = false;
     }
 
+    private bool DiseaseBoolActive(Disease crntDisease)
+    {
+        return Context.AnimalDiseases.FirstOrDefault(x => x.DiseaseId == crntDisease.Id && x.AnimalId == currentAnimal.Id) != null;
+    }
+
+    public void DiseaseToCheck(Disease crntDisease)
+    {
+        if (!DiseaseBoolActive(crntDisease))
+        {
+            var newAnimalDisease = new AnimalDisease()
+                {
+                    AnimalId = currentAnimal.Id,
+                    DiseaseId = crntDisease.Id
+                };
+            Context.AnimalDiseases.Add(newAnimalDisease);
+        }
+        else
+        {
+            Context.AnimalDiseases.Remove(Context.AnimalDiseases.FirstOrDefault(x => x.DiseaseId == crntDisease.Id && x.AnimalId == currentAnimal.Id));
+        }
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+    }
+
+    private bool VaccinationBoolActive(Vaccination crntVaccination)
+    {
+        return Context.AnimalVaccinations.FirstOrDefault(x => x.VaccinationId == crntVaccination.Id && x.AnimalId == currentAnimal.Id) != null;
+    }
+
+    public void VaccinationToCheck(Vaccination crntVaccination)
+    {
+        if (!VaccinationBoolActive(crntVaccination))
+        {
+            var newAnimalVaccination = new AnimalVaccination()
+                {
+                    AnimalId = currentAnimal.Id,
+                    VaccinationId = crntVaccination.Id
+                };
+            Context.AnimalVaccinations.Add(newAnimalVaccination);
+        }
+        else
+        {
+            Context.AnimalVaccinations.Remove(Context.AnimalVaccinations.FirstOrDefault(x => x.VaccinationId == crntVaccination.Id && x.AnimalId == currentAnimal.Id));
+        }
+        Context.SaveChanges();
+        Context.ChangeTracker.Clear();
+    }
+
     private void GetFields()
     {
         animalAviary = Context.Aviaries.FirstOrDefault(x => x.Id == currentAnimal.AviaryId).Title;
@@ -185,6 +298,35 @@
         animalBirthDate = currentAnimal.BirthDate;
         animalImage = currentAnimal.Image;
         imagePath = $"/images/Animals/{currentAnimal.Image}";
+
+        diseaseList = Context.AnimalDiseases.Where(x => x.AnimalId == currentAnimal.Id).ToList();
+        foreach(var d in diseaseList)
+        {
+            if (count)
+            {
+                animalDisease += (Context.Diseases.FirstOrDefault(x => x.Id == d.DiseaseId)).Title;
+                count = false;
+            }
+            else
+            {
+                animalDisease += ", " + (Context.Diseases.FirstOrDefault(x => x.Id == d.DiseaseId)).Title;
+            }
+        }
+
+        vaccinationList = Context.AnimalVaccinations.Where(x => x.AnimalId == currentAnimal.Id).ToList();
+        count = true;
+        foreach (var v in vaccinationList)
+        {
+            if(count)
+            {
+                animalVaccination += (Context.Vaccinations.FirstOrDefault(x => x.Id == v.VaccinationId)).Title;
+                count = false;
+            }
+            else
+            {
+                animalVaccination += ", " + (Context.Vaccinations.FirstOrDefault(x => x.Id == v.VaccinationId)).Title;
+            }
+        }
     }
 
     private void GetData()

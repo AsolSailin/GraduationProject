@@ -167,7 +167,7 @@
 
     private List<Aviary> aviariesList = new List<Aviary>();
     private List<Animal> animalsList = new List<Animal>();
-    private List<AnimalMaterial> animalMaterials = new List<AnimalMaterial>();
+    private List<MaterialApplication> materialApplications = new List<MaterialApplication>();
     private List<CareMaterial> materials = new List<CareMaterial>();
 
     public List<int> dataList = new List<int>();
@@ -202,28 +202,28 @@
             case "Ветеринар":
                 foreach (Animal item in animalsList)
                 {
-                    animalMaterials = Context.AnimalMaterials.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
+                    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
                         (x.MaterialId == 8 || x.MaterialId == 9 || x.MaterialId == 10)).ToList();
-                    dataList.Add(animalMaterials.Count);
+                    dataList.Add(materialApplications.Count);
                     labelsList.Add(item.Name);
                 }
                 break;
             case "Кипер":
                 foreach (Animal item in animalsList)
                 {
-                    animalMaterials = Context.AnimalMaterials.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
+                    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
                         (x.MaterialId == 1 || x.MaterialId == 2 || x.MaterialId == 3 || x.MaterialId == 4 ||
                             x.MaterialId == 5 || x.MaterialId == 6 || x.MaterialId == 7)).ToList();
-                    dataList.Add(animalMaterials.Count);
+                    dataList.Add(materialApplications.Count);
                     labelsList.Add(item.Name);
                 }
                 break;
             case "Уборщик":
                 foreach (Animal item in animalsList)
                 {
-                    animalMaterials = Context.AnimalMaterials.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
+                    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
                         (x.MaterialId == 11 || x.MaterialId == 12 || x.MaterialId == 13)).ToList();
-                    dataList.Add(animalMaterials.Count);
+                    dataList.Add(materialApplications.Count);
                     labelsList.Add(item.Name);
                 }
                 break;

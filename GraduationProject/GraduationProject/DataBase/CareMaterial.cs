@@ -27,7 +27,7 @@ public partial class CareMaterial
 
     public virtual ICollection<AnimalMaterial> AnimalMaterials { get; set; } = new List<AnimalMaterial>();
 
-    public virtual ICollection<MaterialSupplier> MaterialSuppliers { get; set; } = new List<MaterialSupplier>();
+    public virtual ICollection<MaterialApplication> MaterialApplications { get; set; } = new List<MaterialApplication>();
 
     public virtual MeasurementUnit? MeasurementUnit { get; set; }
 

@@ -9,13 +9,7 @@ public partial class Disease
 
     public string? Title { get; set; }
 
-    public int? DiseaseTypeId { get; set; }
-
-    public int? VaccinationId { get; set; }
+    public bool? IsQuarantine { get; set; }
 
     public virtual ICollection<AnimalDisease> AnimalDiseases { get; set; } = new List<AnimalDisease>();
-
-    public virtual DiseaseType? DiseaseType { get; set; }
-
-    public virtual Vaccination? Vaccination { get; set; }
 }

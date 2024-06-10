@@ -82,7 +82,7 @@
             <MudText Class="labelText">Список животных в вольере:</MudText>
             <MudTable T="Animal" Items="@animalsList" @bind-SelectedItem="selectedItem" OnRowClick="@OnRowClick" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; overflow: scroll; height: 317px">
                 <RowTemplate>
-                    <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Name</MudTd>
+                    <MudTd DataLabel="Title" Style="font-size: 20px;">@GetAnimal(context)</MudTd>
                 </RowTemplate>
             </MudTable>
         </div>
@@ -107,6 +107,26 @@
         animalsList = Context.Animals.Where(x => x.AviaryId == int.Parse(currentAviaryId) && x.IsDeleted == false).ToList();
         type = Context.TypeAviaries.FirstOrDefault(x => x.Id == currentAviary.TypeId).Title;
         kind = Context.AnimalKinds.FirstOrDefault(x => x.Id == currentAviary.KindId).Title;
+    }
+
+    private string GetAnimal(Animal crntAnimal)
+    {
+        var quarantine = false;
+        var animalDiseaseList = Context.AnimalDiseases.Where(x => x.AnimalId == crntAnimal.Id).ToList();
+        var diseaseList = new List<Disease>();
+
+        foreach (var ad in animalDiseaseList)
+        {
+            diseaseList.Add(Context.Diseases.FirstOrDefault(x => x.Id == ad.DiseaseId));
+        }
+
+        foreach (var d in diseaseList)
+        {
+            if (d.IsQuarantine ?? false)
+                quarantine = true;
+        }
+
+        return quarantine ? crntAnimal.Name + " (на карантине)" : crntAnimal.Name;
     }
 
     public async Task OnRowClick(TableRowClickEventArgs<Animal> args) => Navigation.NavigateTo($"/animal_page/{selectedItem.Id}");

@@ -31,9 +31,13 @@ public partial class Animal
 
     public virtual ICollection<AnimalMaterial> AnimalMaterials { get; set; } = new List<AnimalMaterial>();
 
+    public virtual ICollection<AnimalVaccination> AnimalVaccinations { get; set; } = new List<AnimalVaccination>();
+
     public virtual Aviary? Aviary { get; set; }
 
     public virtual AnimalGender? Gender { get; set; }
+
+    public virtual ICollection<MaterialApplication> MaterialApplications { get; set; } = new List<MaterialApplication>();
 
     public virtual ICollection<Offspring> Offspring { get; set; } = new List<Offspring>();
 }
