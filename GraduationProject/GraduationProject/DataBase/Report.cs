@@ -17,6 +17,8 @@ public partial class Report
 
     public string Description { get; set; } = null!;
 
+    public virtual ICollection<AnimalReport> AnimalReports { get; set; } = new List<AnimalReport>();
+
     public virtual Aviary Aviary { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

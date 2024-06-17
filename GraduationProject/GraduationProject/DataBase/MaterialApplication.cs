@@ -13,6 +13,8 @@ public partial class MaterialApplication
 
     public DateTime? Date { get; set; }
 
+    public double Expense { get; set; }
+
     public virtual Animal Animal { get; set; } = null!;
 
     public virtual CareMaterial Material { get; set; } = null!;

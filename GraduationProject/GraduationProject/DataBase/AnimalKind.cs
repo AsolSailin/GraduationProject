@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraduationProject.DataBase;
 
-namespace GraduationProject.DataBase;
+namespace GraduationProject;
 
 public partial class AnimalKind
 {

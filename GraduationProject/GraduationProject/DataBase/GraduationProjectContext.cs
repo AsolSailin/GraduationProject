@@ -27,6 +27,8 @@ public partial class GraduationProjectContext : DbContext
 
     public virtual DbSet<AnimalMaterial> AnimalMaterials { get; set; }
 
+    public virtual DbSet<AnimalReport> AnimalReports { get; set; }
+
     public virtual DbSet<AnimalVaccination> AnimalVaccinations { get; set; }
 
     public virtual DbSet<Aviary> Aviaries { get; set; }
@@ -162,6 +164,25 @@ public partial class GraduationProjectContext : DbContext
                 .HasConstraintName("FK_Animal_Material_CareMaterial");
         });
 
+        modelBuilder.Entity<AnimalReport>(entity =>
+        {
+            entity.ToTable("Animal_Report");
+
+            entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
+            entity.Property(e => e.Condition)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+            entity.Property(e => e.ReportId).HasColumnName("Report_Id");
+
+            entity.HasOne(d => d.Animal).WithMany(p => p.AnimalReports)
+                .HasForeignKey(d => d.AnimalId)
+                .HasConstraintName("FK_Animal_Report_Animal");
+
+            entity.HasOne(d => d.Report).WithMany(p => p.AnimalReports)
+                .HasForeignKey(d => d.ReportId)
+                .HasConstraintName("FK_Animal_Report_Report");
+        });
+
         modelBuilder.Entity<AnimalVaccination>(entity =>
         {
             entity.ToTable("Animal_Vaccination");
@@ -263,9 +284,14 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("MaterialType");
 
+            entity.Property(e => e.RoleId).HasColumnName("Role_Id");
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+
+            entity.HasOne(d => d.Role).WithMany(p => p.MaterialTypes)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK_MaterialType_Role");
         });
 
         modelBuilder.Entity<MeasurementUnit>(entity =>

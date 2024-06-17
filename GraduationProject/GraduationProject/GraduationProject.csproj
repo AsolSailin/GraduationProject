@@ -20,12 +20,4 @@
     <PackageReference Include="MudBlazor" Version="6.19.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\VeterinarianPages\" />
-    <Folder Include="Pages\KeeperPages\" />
-    <Folder Include="Pages\WarehousemanPages\" />
-    <Folder Include="Pages\MasterPages\" />
-    <Folder Include="Pages\CleanerPages\" />
-  </ItemGroup>
-
 </Project>

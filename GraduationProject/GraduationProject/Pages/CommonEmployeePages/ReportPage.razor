@@ -1,11 +1,13 @@
 ﻿@page "/report_page/{currentReportId}"
 @using GraduationProject.DataBase
 @using GraduationProject.RazorComponents
+@using GraduationProject.Services
 @inject IDialogService DialogService
 @inject GraduationProjectContext Context
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
 @inject IJSRuntime iJSRuntime
+@inject CurrentElementService CurrentElement
 
 <PageTitle>СТРАНИЦА ОТЧЕТА</PageTitle>
 
@@ -16,7 +18,7 @@
         top: 100px;
         width: 1000px;
         height: 550px;
-        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;  
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
         background-color: #EEFFF7;
     }
 
@@ -60,7 +62,7 @@
         overflow-y: scroll;
     }
 
-    p{
+    p {
         margin-bottom: 0;
     }
 </style>
@@ -70,7 +72,7 @@
         <div>
             <p Class="mainLabel" style="text-decoration: underline;">Отчет №@currentReportId</p>
             <p Class="mainLabel" style="font-size: 20px; margin-bottom: 30px;">за @currentReport.Date.ToString("d")</p>
-            @if (!currentReport.IsAccepted || currentRole.Title == "Администратор")
+            @if (!currentReport.IsAccepted || CurrentElement.CurrentRole == "Администратор")
             {
                 <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F;" Class="d-flex mx-auto" OnClick="GetAccept">Принять отчет</MudButton>
             }
@@ -107,26 +109,18 @@
                     case "Кладовщик":
                         <MudText Class="labelText">Диаграмма материалов</MudText>
                         break;
-                    case "Строитель-ремонтник":
-                        <MudText Class="labelText">Диаграмма ремонтых работы</MudText>
-                        break;
-                    case "Уборщик":
-                        <MudText Class="labelText">Диаграмма уборки</MudText>
-                        break;
-                    case "Билетный кассир":
-                        <MudText Class="labelText">Диаграмма продаж</MudText>
-                        break;
-                    case "Кассир кафе":
-                        <MudText Class="labelText">Диаграмма продаж</MudText>
-                        break;
                 }
                 <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Bottom" Width="270px" Height="270px"
-                          InputData="@data" InputLabels="@labels"></MudChart>
+                          InputData="@data" InputLabels="@labels">
+                    <CustomGraphics>
+                        <text x="49%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="black" font-size="3" style="color: #21A77F;">Расход</text>
+                        <text x="49%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-size="5" style="color: #21A77F;">@data.Sum().ToString() кг</text>
+                    </CustomGraphics>
+                    </MudChart>
             </div>
         </div>
         <div style="margin-left: 50px; margin-right: 50px;">
-            @if (currentRole.Title == "Ветеринар" || currentRole.Title == "Кипер"
-            || currentRole.Title == "Строитель-ремонтник" || currentRole.Title == "Уборщик")
+            @if (currentRole.Title == "Ветеринар" || currentRole.Title == "Кипер")
             {
                 <MudText Class="labelText">Отчетная таблица:</MudText>
                 <MudTable Items="@aviariesList" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
@@ -145,18 +139,32 @@
                         <MudTd DataLabel="Title" Style="font-size: 20px;">@GetCount(context)</MudTd>
                     </RowTemplate>
                 </MudTable>
-            }
-            else if (currentRole.Title == "Билетный кассир" || currentRole.Title == "Кассир кафе")
-            {
 
+                <MudText Class="labelText">Состояние животных:</MudText>
+                <MudTable Items="@animalConditionList" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
+                    <HeaderContent>
+                        <MudTh>Животное</MudTh>
+                        <MudTh>Описание</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@Context.Animals.FirstOrDefault(x => x.Id == context.Id).Name</MudTd>
+                        <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Condition</MudTd>
+                    </RowTemplate>
+                </MudTable>
             }
             else if (currentRole.Title == "Кладовщик")
             {
 
             }
         </div>
-        <MudText style="font-size: 20px; margin-left: 50px; margin-top: 10px;">@currentReport.Description</MudText>
-        <MudButton Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; margin-left: 50px; margin-bottom: 10px;" Variant="Variant.Outlined" OnClick="GetDoc">Скачать PDF-файл</MudButton>
+        <div>
+            <MudText style="font-size: 25px; font-weight: 500; margin-left: 50px; margin-top: 10px;">Дополнительно</MudText>
+            <MudText style="font-size: 20px; margin-left: 50px; margin-top: 10px;">@currentReport.Description</MudText>
+        </div>
+        <hr />
+        <div>
+            <MudButton Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; margin-left: 50px; margin-bottom: 10px;" Variant="Variant.Outlined" OnClick="GetDoc">Скачать PDF-файл</MudButton>
+        </div>
     </div>
 </MudPaper>
 
@@ -167,10 +175,12 @@
 
     private List<Aviary> aviariesList = new List<Aviary>();
     private List<Animal> animalsList = new List<Animal>();
-    private List<MaterialApplication> materialApplications = new List<MaterialApplication>();
+    private MaterialApplication materialApplications = new MaterialApplication();
+    private MaterialType materialType = new MaterialType();
     private List<CareMaterial> materials = new List<CareMaterial>();
+    private List<AnimalReport> animalConditionList = new List<AnimalReport>();
 
-    public List<int> dataList = new List<int>();
+    public List<double> dataList = new List<double>();
     public List<string> labelsList = new List<string>();
 
     private Report currentReport = new Report();
@@ -196,37 +206,45 @@
 
         aviariesList = Context.Aviaries.Where(x => x.Id == currentReport.AviaryId).ToList();
         animalsList = Context.Animals.Where(x => x.AviaryId == currentAviary.Id && x.IsDeleted == false).ToList();
+        animalConditionList = Context.AnimalReports.Where(x => x.ReportId == currentReport.Id).ToList();
 
         switch (currentRole.Title)
         {
             case "Ветеринар":
-                foreach (Animal item in animalsList)
-                {
-                    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
-                        (x.MaterialId == 8 || x.MaterialId == 9 || x.MaterialId == 10)).ToList();
-                    dataList.Add(materialApplications.Count);
-                    labelsList.Add(item.Name);
-                }
+                materialType = Context.MaterialTypes.FirstOrDefault(x => x.RoleId == Context.Roles.FirstOrDefault(x => x.Title == "Ветеринар").Id);
+
+
+                //foreach (Animal item in animalsList)
+                //{
+                //    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
+                //        (x.MaterialId == 8 || x.MaterialId == 9 || x.MaterialId == 10)).ToList();
+                //    dataList.Add(materialApplications.Count);
+                //    labelsList.Add(item.Name);
+                //}
                 break;
             case "Кипер":
-                foreach (Animal item in animalsList)
-                {
-                    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
-                        (x.MaterialId == 1 || x.MaterialId == 2 || x.MaterialId == 3 || x.MaterialId == 4 ||
-                            x.MaterialId == 5 || x.MaterialId == 6 || x.MaterialId == 7)).ToList();
-                    dataList.Add(materialApplications.Count);
-                    labelsList.Add(item.Name);
-                }
+                materialType = Context.MaterialTypes.FirstOrDefault(x => x.RoleId == Context.Roles.FirstOrDefault(x => x.Title == "Кипер").Id);
+                //foreach (Animal item in animalsList)
+                //{
+                //    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
+                //        (x.MaterialId == 1 || x.MaterialId == 2 || x.MaterialId == 3 || x.MaterialId == 4 ||
+                //            x.MaterialId == 5 || x.MaterialId == 6 || x.MaterialId == 7)).ToList();
+                //    dataList.Add(materialApplications.Count);
+                //    labelsList.Add(item.Name);
+                //}
                 break;
-            case "Уборщик":
-                foreach (Animal item in animalsList)
-                {
-                    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
-                        (x.MaterialId == 11 || x.MaterialId == 12 || x.MaterialId == 13)).ToList();
-                    dataList.Add(materialApplications.Count);
-                    labelsList.Add(item.Name);
-                }
-                break;
+        }
+
+        var careMaterialList = Context.CareMaterials.Where(x => x.TypeId == materialType.Id).ToList();
+
+        foreach (var m in careMaterialList)
+        {
+            materialApplications = Context.MaterialApplications.FirstOrDefault(x => x.MaterialId == m.Id && x.Date == currentReport.Date);
+            if (materialApplications != null)
+            {
+                dataList.Add(materialApplications.Expense);
+                labelsList.Add(m.Title);
+            }
         }
 
         data = dataList.ToArray().Select(Convert.ToDouble).ToArray();

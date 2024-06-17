@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using GraduationProject.DataBase;
 
-namespace GraduationProject.DataBase;
+namespace GraduationProject;
 
 public partial class Animal
 {
@@ -30,6 +31,8 @@ public partial class Animal
     public virtual ICollection<AnimalDisease> AnimalDiseases { get; set; } = new List<AnimalDisease>();
 
     public virtual ICollection<AnimalMaterial> AnimalMaterials { get; set; } = new List<AnimalMaterial>();
+
+    public virtual ICollection<AnimalReport> AnimalReports { get; set; } = new List<AnimalReport>();
 
     public virtual ICollection<AnimalVaccination> AnimalVaccinations { get; set; } = new List<AnimalVaccination>();
 
