@@ -27,10 +27,10 @@ public partial class Aviary
 
     public virtual TypeAviary Type { get; set; } = null!;
 
-    public void GeneratePDF(GraduationProjectContext context, IJSRuntime iJSRuntime, List<Aviary> aviaries, double[] data, string[] labels, Role currentRole, User currentUser, Report currentReport)
+    public void GeneratePDF(GraduationProjectContext context, IJSRuntime iJSRuntime, List<Aviary> aviaries, double[] data, string[] labels, Role currentRole, User currentUser, Report currentReport, double currentWater, List<string> names, List<string> descriptions)
     {
         ReportService reportService = new();
         iJSRuntime.InvokeAsync<Animal>(
-            "saveAsFile", "Отчет.pdf", Convert.ToBase64String(reportService.CreateReport(context, aviaries, data, labels, currentRole, currentUser, currentReport)));
+            "saveAsFile", "Отчет.pdf", Convert.ToBase64String(reportService.CreateReport(context, aviaries, data, labels, currentRole, currentUser, currentReport, currentWater, names, descriptions)));
     }
 }

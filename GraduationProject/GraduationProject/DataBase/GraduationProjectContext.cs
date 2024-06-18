@@ -265,19 +265,18 @@ public partial class GraduationProjectContext : DbContext
         {
             entity.ToTable("MaterialApplication");
 
-            entity.Property(e => e.AnimalId).HasColumnName("Animal_Id");
             entity.Property(e => e.Date).HasColumnType("date");
             entity.Property(e => e.MaterialId).HasColumnName("Material_Id");
-
-            entity.HasOne(d => d.Animal).WithMany(p => p.MaterialApplications)
-                .HasForeignKey(d => d.AnimalId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_MaterialApplication_Animal");
+            entity.Property(e => e.ReportId).HasColumnName("Report_Id");
 
             entity.HasOne(d => d.Material).WithMany(p => p.MaterialApplications)
                 .HasForeignKey(d => d.MaterialId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_MaterialApplication_CareMaterial");
+
+            entity.HasOne(d => d.Report).WithMany(p => p.MaterialApplications)
+                .HasForeignKey(d => d.ReportId)
+                .HasConstraintName("FK_MaterialApplication_Report");
         });
 
         modelBuilder.Entity<MaterialType>(entity =>

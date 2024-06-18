@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraduationProject.DataBase;
 
-namespace GraduationProject;
+namespace GraduationProject.DataBase;
 
 public partial class Animal
 {
@@ -39,8 +38,6 @@ public partial class Animal
     public virtual Aviary? Aviary { get; set; }
 
     public virtual AnimalGender? Gender { get; set; }
-
-    public virtual ICollection<MaterialApplication> MaterialApplications { get; set; } = new List<MaterialApplication>();
 
     public virtual ICollection<Offspring> Offspring { get; set; } = new List<Offspring>();
 }

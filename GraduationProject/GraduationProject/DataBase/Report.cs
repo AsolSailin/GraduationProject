@@ -21,5 +21,7 @@ public partial class Report
 
     public virtual Aviary Aviary { get; set; } = null!;
 
+    public virtual ICollection<MaterialApplication> MaterialApplications { get; set; } = new List<MaterialApplication>();
+
     public virtual User User { get; set; } = null!;
 }

@@ -175,18 +175,22 @@
 
     private List<Aviary> aviariesList = new List<Aviary>();
     private List<Animal> animalsList = new List<Animal>();
-    private MaterialApplication materialApplications = new MaterialApplication();
+    private List<MaterialApplication> materialApplications = new List<MaterialApplication>();
     private MaterialType materialType = new MaterialType();
     private List<CareMaterial> materials = new List<CareMaterial>();
     private List<AnimalReport> animalConditionList = new List<AnimalReport>();
 
     public List<double> dataList = new List<double>();
     public List<string> labelsList = new List<string>();
+    public List<string> names = new List<string>();
+    public List<string> descriptions = new List<string>();
 
     private Report currentReport = new Report();
     private User currentUser = new User();
     private Aviary currentAviary = new Aviary();
     private Role currentRole = new Role();
+
+    private double currentWater;
 
     public string[] labels = new string[] { };
     public double[] data = new double[] { };
@@ -194,7 +198,7 @@
     private void GetDoc()
     {
         Aviary aviary = new Aviary();
-        aviary.GeneratePDF(Context, iJSRuntime, aviariesList, data, labels, currentRole, currentUser, currentReport);
+        aviary.GeneratePDF(Context, iJSRuntime, aviariesList, data, labels, currentRole, currentUser, currentReport, currentWater, names, descriptions);
     }
 
     protected override async Task OnInitializedAsync()
@@ -207,6 +211,12 @@
         aviariesList = Context.Aviaries.Where(x => x.Id == currentReport.AviaryId).ToList();
         animalsList = Context.Animals.Where(x => x.AviaryId == currentAviary.Id && x.IsDeleted == false).ToList();
         animalConditionList = Context.AnimalReports.Where(x => x.ReportId == currentReport.Id).ToList();
+
+        foreach (var acl in animalConditionList)
+        {
+            names.Add(Context.Animals.FirstOrDefault(x => x.Id == acl.AnimalId).Name);
+            descriptions.Add(acl.Condition);
+        }
 
         switch (currentRole.Title)
         {
@@ -235,15 +245,21 @@
                 break;
         }
 
+        var water = Context.CareMaterials.FirstOrDefault(x => x.Title == "Вода");
+        currentWater = Context.MaterialApplications.FirstOrDefault(x => x.MaterialId == water.Id && x.Date == currentReport.Date).Expense;
+
         var careMaterialList = Context.CareMaterials.Where(x => x.TypeId == materialType.Id).ToList();
 
         foreach (var m in careMaterialList)
         {
-            materialApplications = Context.MaterialApplications.FirstOrDefault(x => x.MaterialId == m.Id && x.Date == currentReport.Date);
+            materialApplications = Context.MaterialApplications.Where(x => x.MaterialId == m.Id && x.Date == currentReport.Date && x.MaterialId != water.Id).ToList();
             if (materialApplications != null)
             {
-                dataList.Add(materialApplications.Expense);
-                labelsList.Add(m.Title);
+                foreach (var ma in materialApplications)
+                {
+                    dataList.Add(ma.Expense);
+                    labelsList.Add(m.Title);
+                }
             }
         }
 

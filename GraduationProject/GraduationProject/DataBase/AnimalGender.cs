@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GraduationProject;
+namespace GraduationProject.DataBase;
 
 public partial class AnimalGender
 {

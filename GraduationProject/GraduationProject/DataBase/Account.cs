@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using GraduationProject.DataBase;
 
-namespace GraduationProject;
+namespace GraduationProject.DataBase;
 
 public partial class Account
 {

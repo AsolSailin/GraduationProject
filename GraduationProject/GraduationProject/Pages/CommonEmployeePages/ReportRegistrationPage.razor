@@ -83,29 +83,31 @@
         </div>
         <table>
             <tr><th>
-                    <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetAnimals" Value="aviary" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetAnimals" Value="aviary" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; width: 120px">
                         @foreach (var a in aviaries)
                     {
                                     <MudSelectItem Value="@(a.Title)" />
                     }
-                </MudSelect></th><th>
-                <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetAnimal" Value="animal" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; ">
+                </MudSelect></th></tr><hr/>
+                @if (aviary != null)
+                {
                     @foreach (var a in animals)
-                    {
-                                <MudSelectItem Value="@(a.Name)" />
-                    }
-                </MudSelect></th><th>
-                    <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetMaterial" Value="material" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; width: 200px">
-                    @foreach (var m in materials)
-                    {
-                                <MudSelectItem Value="@(m.Title)" />
-                    }
-                </MudSelect>
-            </th>
-                <th><input style="font-size: 16px; height: 60px; width: 100px" @bind-value="materialValue" /></th>
-            </tr>
+            {
+                <tr><th><input style="font-size: 16px; height: 60px; margin-top:5px;" @bind-value="a.Name" /></th>
+                        <th>
+                            <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetMaterial" Value="material" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; width: 200px">
+                                @foreach (var m in materials)
+                                {
+                                    <MudSelectItem Value="@(m.Title)" />
+                                }
+                            </MudSelect>
+                        </th>
+                        <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="materialValue" /></th>
+                    </tr>
+            }
             <br />
-            <tr><th><MudText Class="labelText" >Описание:</MudText></th><th><input @bind-value="description" /></th></tr>
+                }
+            <tr><th><MudText Class="labelText" >Описание:</MudText></th><th><input @bind-value="description" /></th></tr><hr/>
         </table>
         <br />
         <MudButton Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; margin-left: 10px; margin-bottom: 10px;" Variant="Variant.Outlined" OnClick="GetReport">Сформировать отчет</MudButton>
@@ -114,11 +116,11 @@
 </MudPaper>
 
 @code {
-    private string materialValue = "Количество";
+    private string materialValue = "Расход";
     private string description;
 
     private List<Aviary> aviaries = new List<Aviary>();
-    private string aviary = "Вид животного (вольер)";
+    private string aviary = "Вольер (вид животных)";
     private List<Animal> animals = new List<Animal>();
     private string animal = "Имя животного";
     private List<CareMaterial> materials = new List<CareMaterial>();
@@ -144,7 +146,6 @@
 
         var newMaterialApplications = new MaterialApplication()
         {
-                AnimalId = Context.Animals.FirstOrDefault(x => x.Name == animal).Id,
                 MaterialId = Context.CareMaterials.FirstOrDefault(x => x.Title == material).Id,
                 Date = DateTime.Now,
         };
