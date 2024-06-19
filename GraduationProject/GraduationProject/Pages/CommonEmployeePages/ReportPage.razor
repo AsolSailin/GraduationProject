@@ -176,7 +176,7 @@
             }
         </div>
         <div>
-            <MudText style="font-size: 25px; font-weight: 500; margin-left: 50px; margin-top: 10px;">Дополнительно</MudText>
+            <MudText style="font-size: 25px; font-weight: 500; margin-left: 50px; margin-top: 10px;">Дополнительная информация</MudText>
             <MudText style="font-size: 20px; margin-left: 50px; margin-top: 10px;">@currentReport.Description</MudText>
         </div>
         <hr />
@@ -253,7 +253,7 @@
                 break;
             case "Кипер":
                 materialType = Context.MaterialTypes.FirstOrDefault(x => x.RoleId == Context.Roles.FirstOrDefault(x => x.Title == "Кипер").Id);
-                var water = Context.CareMaterials.FirstOrDefault(x => x.Title == "Вода");
+                water = Context.CareMaterials.FirstOrDefault(x => x.Title == "Вода");
                 currentWater = Context.MaterialApplications.FirstOrDefault(x => x.MaterialId == water.Id && x.Date == currentReport.Date).Expense;
                 //foreach (Animal item in animalsList)
                 //{
@@ -266,7 +266,7 @@
                 break;
         }
 
-        var careMaterialList = Context.CareMaterials.Where(x => x.TypeId == materialType.Id).ToList();
+        var careMaterialList = Context.CareMaterials.Where(x => x.TypeId == materialType.Id && x.Id != water.Id).ToList();
 
         foreach (var m in careMaterialList)
         {

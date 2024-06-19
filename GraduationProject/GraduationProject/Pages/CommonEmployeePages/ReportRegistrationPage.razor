@@ -99,28 +99,28 @@
                     @if (aviary != "Вольер (вид животных)")
                     {
                         <tr>
-                            <th><MudText Class="labelText">@GetMaterialTitle() (кг)</MudText></th>
+                            <th><MudText Class="labelText">@GetMaterialTitle() (кг/жив)</MudText></th>
                             <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="@expense" /></th>
                         </tr>
                         <br />
                     }
                     <tr>
-                        <th><MudText Class="labelText">Вода (л)</MudText></th>
+                        <th><MudText Class="labelText">Вода (л/жив)</MudText></th>
                         <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="@waterExpense" /></th>
                     </tr>
                     <br />
                     break;
                 case "Ветеринар":
                     <tr>
-                        <th><MudText Class="labelText">Антигриппин (шт) </MudText></th>
+                        <th><MudText Class="labelText">Антигриппин (шт/жив) </MudText></th>
                         <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="@gripp" /></th>
                     </tr>
                     <tr>
-                        <th><MudText Class="labelText">Антиаллергин (шт)</MudText></th>
+                        <th><MudText Class="labelText">Антиаллергин (шт/жив)</MudText></th>
                         <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="@allerg" /></th>
                     </tr>
                     <tr>
-                        <th><MudText Class="labelText">Антиглист (шт)</MudText></th>
+                        <th><MudText Class="labelText">Антиглист (шт/жив)</MudText></th>
                         <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="@glist" /></th>
                     </tr>
                     <br />

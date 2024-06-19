@@ -3,6 +3,7 @@
 @using GraduationProject.Services
 @using GraduationProject.RazorComponents;
 @inject GraduationProjectContext Context
+@inject CurrentElementService CurrentElement
 @inject NavigationManager Navigation
 @inject FileSystemService FileSystemService
 @inject IDialogService DialogService
@@ -151,7 +152,7 @@
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="Title">@context.Title</MudTd>
-                        <MudTd DataLabel="IsCheck"><MudCheckBox Style="color: #658dc3;" Checked="DiseaseBoolActive(context)" Class="d-flex mx-auto" @onclick="() => DiseaseToCheck(context)" Disabled="@edit"></MudCheckBox></MudTd>
+                        <MudTd DataLabel="IsCheck"><MudCheckBox Style="color: #658dc3;" Checked="DiseaseBoolActive(context)" Class="d-flex mx-auto" @onclick="() => DiseaseToCheck(context)" Disabled="@medEdit"></MudCheckBox></MudTd>
                         </RowTemplate>
                     </MudTable>
             </div>
@@ -169,7 +170,7 @@
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Title">@context.Title</MudTd>
-                        <MudTd DataLabel="IsCheck"><MudCheckBox Style="color: #658dc3;" Checked="VaccinationBoolActive(context)" Class="d-flex mx-auto" @onclick="() => VaccinationToCheck(context)" Disabled="@edit"></MudCheckBox></MudTd>
+                        <MudTd DataLabel="IsCheck"><MudCheckBox Style="color: #658dc3;" Checked="VaccinationBoolActive(context)" Class="d-flex mx-auto" @onclick="() => VaccinationToCheck(context)" Disabled="@medEdit"></MudCheckBox></MudTd>
                     </RowTemplate>
                 </MudTable>
             </div>
@@ -209,6 +210,7 @@
     private string visible = "hidden";
 
     private bool edit = true;
+    private bool medEdit = true;
     private bool count = true;
 
     private List<Disease> DiseaseElements = new List<Disease>();
@@ -239,6 +241,15 @@
     {
         visible = "visible";
         edit = false;
+
+        if (CurrentElement.CurrentRole == "Ветеринар")
+        {
+            medEdit = false;
+        }
+        else
+        {
+            medEdit = true;
+        }
     }
 
     private bool DiseaseBoolActive(Disease crntDisease)
@@ -411,6 +422,7 @@
         GetDate();
         visible = "hidden";
         edit = true;
+        medEdit = true;
     }
 }
 

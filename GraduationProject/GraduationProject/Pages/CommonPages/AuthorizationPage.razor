@@ -109,6 +109,6 @@
 
         CurrentElement.CurrentUser = Context.Users.FirstOrDefault(x => x.Id == CurrentElement.CurrentAccount.UserId);
         CurrentElement.CurrentRole = Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title;
-        Navigation.NavigateTo("/account");
+        Navigation.NavigateTo("/aviary_list");
     }
 }

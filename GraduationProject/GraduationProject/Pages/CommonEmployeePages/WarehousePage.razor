@@ -1,7 +1,6 @@
 ﻿@page "/materials_list"
 @using GraduationProject.DataBase
 @inject GraduationProjectContext Context
-@inject NavigationManager Navigation
 
 <style>
     .mainLabel {
@@ -56,7 +55,7 @@
                 <MudPaper Height="100px" Width="210px" Class="d-flex align-center justify-center mud-width-full py-8" Style="background-color: #A68EFE; box-shadow: none; border-radius: 20px;">
                     <a href="/" @onclick="() => GetMaterial(material)">
                         <MudPaper Height="100px" Width="210px" Style="border: 3px solid #21A77F; box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px; border-radius: 20px;">
-                            <MudText Class="d-flex align-center justify-center mud-width-full py-8" Style="font-size: 25px; font-weight: 500;">@material.Title</MudText>
+                            <MudText Class="d-flex align-center justify-center mud-width-full py-8" Style="font-size: 25px; font-weight: 500;">@GetMaterialTitle(material)</MudText>
                         </MudPaper>
                     </a>
                 </MudPaper>
@@ -65,15 +64,53 @@
     </MudGrid>
 </div>
 
+<MudDialog @bind-IsVisible="visible" Options="options" Style="height: 580px;">
+    <TitleContent>
+        <MudText Style="font-size: 30px">
+            Информация о материале
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="mainblock">
+            <div>
+                <MudText Class="labelText">Название</MudText>
+                <input @bind-value="@careMaterial.Title" />
+            </div>
+            <div>
+                <MudText Class="labelText">Количество на складе</MudText>
+                <input @bind-value="@careMaterial.Quantity" />
+            </div>
+            <div>
+                <MudText Class="labelText">Дата изготовления</MudText>
+                <input @bind-value="@careMaterial.ProductionDate" />
+            </div>
+            <div>
+                <MudText Class="labelText">Дата срока годности</MudText>
+                <input @bind-value="@careMaterial.ExpiryDate" />
+            </div>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Outlined" Style="border-radius: 10px; top: 6px; height: 50px; font-size: 15px; border: 3px solid #21A77F; color: #21A77F; margin-right: 7px;" OnClick="@(() => Add(careMaterial))">Добавить</MudButton>
+    </DialogActions>
+</MudDialog>
+
 @code {
     private int spacing { get; set; } = 5;
 
     private List<CareMaterial> materials = new List<CareMaterial>();
     private List<MaterialType> types = new List<MaterialType>();
+    private CareMaterial careMaterial = new CareMaterial();
 
     private static readonly MaterialType _allTypes = new MaterialType() { Title = "Все" };
 
     private string currentType = "Все";
+    private string materialTitle = "";
+    private string materialsQuanitity = "";
+    private string materialProductionDate = "";
+    private string materialExpiryDate = "";
+    private bool visible;
+    private DialogOptions options = new DialogOptions { CloseOnEscapeKey = true };
 
     protected override async Task OnInitializedAsync()
     {
@@ -98,6 +135,17 @@
 
     private void GetMaterial(CareMaterial material)
     {
-        //Navigation.NavigateTo($"/animal_info/{animal.Id}");
+        careMaterial = material;
+        visible = true;
+    }
+
+    private string GetMaterialTitle(CareMaterial material)
+    {
+        return material.Title;
+    }
+
+    private void Add(CareMaterial material)
+    {
+        
     }
 }

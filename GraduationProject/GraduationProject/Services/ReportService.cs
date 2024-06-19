@@ -254,7 +254,7 @@ namespace GraduationProject.Services
                     pdfPTable.CompleteRow();
                     break;
                 case 4:
-                    Paragraph addition = new Paragraph($"\nДополнительно: {_currentReport.Description}", _fontStyle);
+                    Paragraph addition = new Paragraph($"\nДополнительная информация: {_currentReport.Description}", _fontStyle);
 
                     _pdfPCell = new PdfPCell(new Phrase(addition));
                     _pdfPCell.Colspan = maxColumn;
