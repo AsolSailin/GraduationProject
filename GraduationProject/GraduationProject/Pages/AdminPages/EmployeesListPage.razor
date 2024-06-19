@@ -109,30 +109,6 @@
                 <input @bind-value="employeePatronymic" />
             </div>
             <div>
-                <MudText Class="labelText">Вид документа<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="identityDoc" />
-            </div>
-            <div>
-                <MudText Class="labelText">Серия<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="series" />
-            </div>
-            <div>
-                <MudText Class="labelText">Номер<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="number" />
-            </div>
-            <div>
-                <MudText Class="labelText">Кем выдан<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="issuedPlace" />
-            </div>
-            <div>
-                <MudText Class="labelText">Код подразделения<span style="visibility: @visible"> *</span></MudText>
-                <input @bind-value="divissionCode" />
-            </div>
-            <div>
-                <MudText Class="labelText">Дата выдачи<span style="visibility: @visible"> *</span></MudText>
-                <MudDatePicker @bind-Date="issueDate" DisableToolbar="true" Style="width: 380px; margin-left: 10px;" />
-            </div>
-            <div>
                 <MudText Class="labelText">Дата рождения<span style="visibility: @visible"> *</span></MudText>
                 <MudDatePicker @bind-Date="birthDate" DisableToolbar="true" Style="width: 380px; margin-left: 10px;" />
             </div>
@@ -233,46 +209,41 @@
         if (employeeSurname == "" ||
         employeeName == "" ||
         employeeRole == "" ||
-        identityDoc == "" ||
-        series == "" ||
-        number == "" ||
-        issuedPlace == "" ||
-        divissionCode == "" ||
         gender == "")
         {
             Snackbar.Add("Для добавления сотрудника все обязательные поля должны быть заполнены!", Severity.Error, config => { config.ShowCloseIcon = false; });
             return;
         }
 
-        if (!StringIsDigits(series) || !StringIsDigits(number) || !StringIsDigits(divissionCode))
-        {
-            if (!StringIsDigits(series))
-                Snackbar.Add("Серия должна состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+        //if (!StringIsDigits(series) || !StringIsDigits(number) || !StringIsDigits(divissionCode))
+        //{
+        //    if (!StringIsDigits(series))
+        //        Snackbar.Add("Серия должна состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
 
-            if (!StringIsDigits(number))
-                Snackbar.Add("Номер должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+        //    if (!StringIsDigits(number))
+        //        Snackbar.Add("Номер должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
 
-            if (!StringIsDigits(divissionCode))
-                Snackbar.Add("Код подразделения должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
+        //    if (!StringIsDigits(divissionCode))
+        //        Snackbar.Add("Код подразделения должен состоять из цифр!", Severity.Error, config => { config.ShowCloseIcon = false; });
 
-            return;
-        }
+        //    return;
+        //}
 
-        if (series.Length > 4 || series.Length < 4 ||
-            number.Length > 6 || number.Length < 6 ||
-            divissionCode.Length > 6 || divissionCode.Length < 6)
-        {
-            if (series.Length > 4 || series.Length < 4)
-                Snackbar.Add("Серия должна состоять из 4 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+        //if (series.Length > 4 || series.Length < 4 ||
+        //    number.Length > 6 || number.Length < 6 ||
+        //    divissionCode.Length > 6 || divissionCode.Length < 6)
+        //{
+        //    if (series.Length > 4 || series.Length < 4)
+        //        Snackbar.Add("Серия должна состоять из 4 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
 
-            if (number.Length > 6 || number.Length < 6)
-                Snackbar.Add("Номер должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+        //    if (number.Length > 6 || number.Length < 6)
+        //        Snackbar.Add("Номер должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
 
-            if (divissionCode.Length > 6 || divissionCode.Length < 6)
-                Snackbar.Add("Код подразделения должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
+        //    if (divissionCode.Length > 6 || divissionCode.Length < 6)
+        //        Snackbar.Add("Код подразделения должен состоять из 6 чисел!", Severity.Error, config => { config.ShowCloseIcon = false; });
 
-            return;
-        }
+        //    return;
+        //}
 
         if (birthDate > DateTime.Today.AddYears(-18) || issueDate > DateTime.Today)
         {

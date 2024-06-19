@@ -13,7 +13,7 @@
         top: 100px;
         width: 1000px;
         height: 550px;
-        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;  
+        box-shadow: rgb(38, 57, 77) 0px 5px 10px -0px;
         background-color: #EEFFF7;
     }
 
@@ -54,7 +54,7 @@
         height: 100%;
         margin-left: 50px;
         margin-top: 10px;
-        margin-bottom: 3    0px;
+        margin-bottom: 3 0px;
         margin-right: auto;
         overflow-y: scroll;
     }
@@ -82,32 +82,32 @@
             <MudText Class="labelText">БЛОК ОТЧЕТНЫХ ДАННЫХ</MudText>
         </div>
         <table>
-            <tr><th>
-                <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetAnimals" Value="aviary" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; width: 120px">
+            <tr>
+                <th>
+                    <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetAnimals" Value="aviary" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; width: 120px">
                         @foreach (var a in aviaries)
-                    {
-                                    <MudSelectItem Value="@(a.Title)" />
-                    }
-                </MudSelect></th></tr><hr/>
-                @if (aviary != null)
-                {
-                    @foreach (var a in animals)
+                        {
+                            <MudSelectItem Value="@(a.Title)" />
+                        }
+                    </MudSelect>
+                </th>
+            </tr>
+            <hr />
+            @if (aviary != "Вольер (вид животных)")
             {
-                <tr><th><input style="font-size: 16px; height: 60px; margin-top:5px;" @bind-value="a.Name" /></th>
-                        <th>
-                            <MudSelect T="string" Variant="Variant.Outlined" ValueChanged="GetMaterial" Value="material" Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; width: 200px">
-                                @foreach (var m in materials)
-                                {
-                                    <MudSelectItem Value="@(m.Title)" />
-                                }
-                            </MudSelect>
-                        </th>
-                        <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="materialValue" /></th>
-                    </tr>
+                <tr>
+                    <th><MudText Class="labelText">@GetMaterialTitle() (кг)</MudText></th>
+                    <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="@expense" /></th>
+                </tr>
+                <br />
             }
-            <br />
-                }
-            <tr><th><MudText Class="labelText" >Описание:</MudText></th><th><input @bind-value="description" /></th></tr><hr/>
+            <tr>
+                    <th><MudText Class="labelText">Вода (л)</MudText></th>
+                    <th><input style="font-size: 16px; height: 60px; width: 120px; margin-top:5px;" @bind-value="@waterExpense" /></th>
+                </tr>
+                <br />
+            <tr><th><MudText Class="labelText">Описание:</MudText></th><th><input @bind-value="description" /></th></tr>
+            <hr />
         </table>
         <br />
         <MudButton Style="font-size: 16px; border: 3px solid #21A77F; color: #21A77F; border-radius: 10px; margin-left: 10px; margin-bottom: 10px;" Variant="Variant.Outlined" OnClick="GetReport">Сформировать отчет</MudButton>
@@ -121,18 +121,26 @@
 
     private List<Aviary> aviaries = new List<Aviary>();
     private string aviary = "Вольер (вид животных)";
-    private List<Animal> animals = new List<Animal>();
+    private Aviary currentAviary = new Aviary();
+    private AnimalMaterial currentAnimalMaterial = new AnimalMaterial();
+    private Animal currentAnimals = new Animal();
+    private CareMaterial currentCareMaterial = new CareMaterial();
+    private List<Animal> animalList = new List<Animal>();
+    private List<AnimalReport> animalReportList = new List<AnimalReport>();
     private string animal = "Имя животного";
     private List<CareMaterial> materials = new List<CareMaterial>();
+    private List<AnimalMaterial> animalMaterial = new List<AnimalMaterial>();
+    private List<AnimalMaterial> animalMaterialFilt = new List<AnimalMaterial>();
+    private List<MaterialApplication> materialApplicationList = new List<MaterialApplication>();
     private string material = "Материалы";
+    private string expense = "";
+    private string waterExpense = "";
 
     protected override async Task OnInitializedAsync()
     {
         aviaries = Context.Aviaries.ToList();
-        materials = Context.CareMaterials.Where(x => x.Id == 1 || x.Id == 2 || x.Id == 3 || x.Id == 4 ||
-                           x.Id == 5 || x.Id == 6 || x.Id == 7).ToList();
 
-    }        
+    }
 
     private void GetReport()
     {
@@ -145,13 +153,24 @@
             };
 
         var newMaterialApplications = new MaterialApplication()
-        {
-                MaterialId = Context.CareMaterials.FirstOrDefault(x => x.Title == material).Id,
+            {
                 Date = DateTime.Now,
-        };
+                Report = newReport,
+                MaterialId = Context.CareMaterials.FirstOrDefault(x => x.Id == currentAnimalMaterial.MaterialId).Id,
+                Expense = Double.Parse(expense)
+            };
+
+        var newWaterApplications = new MaterialApplication()
+            {
+                Date = DateTime.Now,
+                Report = newReport,
+                MaterialId = Context.CareMaterials.FirstOrDefault(x => x.Title == "Вода").Id,
+                Expense = Double.Parse(waterExpense)
+            };
 
         Context.Reports.Add(newReport);
         Context.MaterialApplications.Add(newMaterialApplications);
+        Context.MaterialApplications.Add(newWaterApplications);
         Context.SaveChanges();
         Context.ChangeTracker.Clear();
 
@@ -161,8 +180,23 @@
     private void GetAnimals(string selected)
     {
         aviary = selected;
-        var a = Context.Aviaries.FirstOrDefault(x => x.Title == selected);
-        animals = Context.Animals.Where(x => x.AviaryId == a.Id).ToList();
+        currentAviary = Context.Aviaries.FirstOrDefault(x => x.Title == aviary);
+        animalList = Context.Animals.Where(x => x.AviaryId == currentAviary.Id && x.IsDeleted == false).ToList();
+
+        currentAnimals = Context.Animals.FirstOrDefault(x => x.AviaryId == currentAviary.Id && x.IsDeleted == false);
+        currentAnimalMaterial = Context.AnimalMaterials.FirstOrDefault(x => x.AnimalId == currentAnimals.Id);
+    }
+
+    private string GetMaterialTitle()
+    {
+        if (aviary != "Вольер (вид животных)")
+        {
+            currentAnimalMaterial = Context.AnimalMaterials.FirstOrDefault(x => x.AnimalId == currentAnimals.Id);
+            currentCareMaterial = Context.CareMaterials.FirstOrDefault(x => x.Id == currentAnimalMaterial.MaterialId);
+            return currentCareMaterial.Title;
+        }
+        return "";
+
     }
 
     private void GetAnimal(string selected)

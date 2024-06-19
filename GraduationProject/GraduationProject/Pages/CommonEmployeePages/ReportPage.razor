@@ -122,6 +122,7 @@
         <div style="margin-left: 50px; margin-right: 50px;">
             @if (currentRole.Title == "Ветеринар" || currentRole.Title == "Кипер")
             {
+                <MudText Class="labelText">@GetWater()</MudText>
                 <MudText Class="labelText">Отчетная таблица:</MudText>
                 <MudTable Items="@aviariesList" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
                     <HeaderContent>
@@ -140,7 +141,7 @@
                     </RowTemplate>
                 </MudTable>
 
-                <MudText Class="labelText">Состояние животных:</MudText>
+                @*<MudText Class="labelText">Состояние животных:</MudText>
                 <MudTable Items="@animalConditionList" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
                     <HeaderContent>
                         <MudTh>Животное</MudTh>
@@ -150,7 +151,8 @@
                         <MudTd DataLabel="Title" Style="font-size: 20px;">@Context.Animals.FirstOrDefault(x => x.Id == context.Id).Name</MudTd>
                         <MudTd DataLabel="Title" Style="font-size: 20px;">@context.Condition</MudTd>
                     </RowTemplate>
-                </MudTable>
+                </MudTable>*@
+                
             }
             else if (currentRole.Title == "Кладовщик")
             {
@@ -285,6 +287,11 @@
             Snackbar.Add("Отчет принят!", Severity.Success, config => { config.ShowCloseIcon = false; });
             Navigation.NavigateTo($"/report_list");
         }
+    }
+
+    private string GetWater()
+    {
+        return $"Общий расход воды: {currentWater}л";
     }
 }
 

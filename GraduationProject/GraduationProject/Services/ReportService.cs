@@ -74,8 +74,8 @@ namespace GraduationProject.Services
             this.ReportBodyOne();
             this.ReportHeader(2);
             this.ReportBodyTwo();
-            this.ReportHeader(3);
-            this.ReportBodyThree();
+            //this.ReportHeader(3);
+            //this.ReportBodyThree();
             this.ReportHeader(4);
 
             _pdfPTableOne.HeaderRows = 2;
@@ -116,8 +116,8 @@ namespace GraduationProject.Services
                     _pdfPTableThree.CompleteRow();
                     break;
                 case 4:
-                    _pdfPTableThree.AddCell(_pdfPCell);
-                    _pdfPTableThree.CompleteRow();
+                    _pdfPTableOne.AddCell(_pdfPCell);
+                    _pdfPTableOne.CompleteRow();
                     break;
             }
             
