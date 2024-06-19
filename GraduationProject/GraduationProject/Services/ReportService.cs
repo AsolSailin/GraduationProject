@@ -200,26 +200,46 @@ namespace GraduationProject.Services
                     pdfPTable.CompleteRow();
                     break;
                 case 2:
-                    Paragraph titoloTwo = new Paragraph("\nТаблица расхода продуктов питания", _fontStyle);
-                    Paragraph water = new Paragraph($"Общий расход воды: {_currentWater}л", _fontStyle);
+                    if(_currentRole.Title == "Кипер")
+                    {
+                        Paragraph titoloTwo = new Paragraph("\nТаблица расхода продуктов питания", _fontStyle);
+                        _pdfPCell = new PdfPCell(new Phrase(titoloTwo));
+                        _pdfPCell.Colspan = maxColumn;
+                        _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
+                        _pdfPCell.Border = 0;
+                        _pdfPCell.ExtraParagraphSpace = 0;
+                        pdfPTable.AddCell(_pdfPCell);
 
-                    _pdfPCell = new PdfPCell(new Phrase(titoloTwo));
-                    _pdfPCell.Colspan = maxColumn;
-                    _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
-                    _pdfPCell.Border = 0;
-                    _pdfPCell.ExtraParagraphSpace = 0;
-                    pdfPTable.AddCell(_pdfPCell);
+                        pdfPTable.CompleteRow();
+                    }
+                    else if (_currentRole.Title == "Ветеринар")
+                    {
+                        Paragraph titoloTwo = new Paragraph("\nТаблица расхода медикаментов", _fontStyle);
+                        _pdfPCell = new PdfPCell(new Phrase(titoloTwo));
+                        _pdfPCell.Colspan = maxColumn;
+                        _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
+                        _pdfPCell.Border = 0;
+                        _pdfPCell.ExtraParagraphSpace = 0;
+                        pdfPTable.AddCell(_pdfPCell);
 
-                    pdfPTable.CompleteRow();
+                        pdfPTable.CompleteRow();
+                    }
 
-                    _pdfPCell = new PdfPCell(new Phrase(water));
-                    _pdfPCell.Colspan = maxColumn;
-                    _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
-                    _pdfPCell.Border = 0;
-                    _pdfPCell.ExtraParagraphSpace = 0;
-                    pdfPTable.AddCell(_pdfPCell);
+                    
 
-                    pdfPTable.CompleteRow();
+                    if (_currentRole.Title == "Кипер")
+                    {
+                        Paragraph water = new Paragraph($"Общий расход воды: {_currentWater}л", _fontStyle);
+
+                        _pdfPCell = new PdfPCell(new Phrase(water));
+                        _pdfPCell.Colspan = maxColumn;
+                        _pdfPCell.HorizontalAlignment = Element.ALIGN_LEFT;
+                        _pdfPCell.Border = 0;
+                        _pdfPCell.ExtraParagraphSpace = 0;
+                        pdfPTable.AddCell(_pdfPCell);
+
+                        pdfPTable.CompleteRow();
+                    }
                     break;
                 case 3:
                     Paragraph titoloThree = new Paragraph("\nТаблица состояния животных", _fontStyle);

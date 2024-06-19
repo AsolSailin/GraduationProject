@@ -72,9 +72,12 @@
         <div>
             <p Class="mainLabel" style="text-decoration: underline;">Отчет №@currentReportId</p>
             <p Class="mainLabel" style="font-size: 20px; margin-bottom: 30px;">за @currentReport.Date.ToString("d")</p>
-            @if (!currentReport.IsAccepted || CurrentElement.CurrentRole == "Администратор")
+            @if (CurrentElement.CurrentRole == "Администратор")
             {
-                <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F;" Class="d-flex mx-auto" OnClick="GetAccept">Принять отчет</MudButton>
+                @if (!currentReport.IsAccepted)
+                {
+                    <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F;" Class="d-flex mx-auto" OnClick="GetAccept">Принять отчет</MudButton>
+                }
             }
         </div>
         <div class="mainBlock">
@@ -110,19 +113,32 @@
                         <MudText Class="labelText">Диаграмма материалов</MudText>
                         break;
                 }
-                <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Bottom" Width="270px" Height="270px"
+                @switch (currentRole.Title)
+                {
+                    case "Ветеринар":
+                        <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Bottom" Width="270px" Height="270px"
+                          InputData="@data" InputLabels="@labels"></MudChart>
+                        break;
+                    case "Кипер":
+                        <MudChart ChartType="ChartType.Donut" LegendPosition="Position.Bottom" Width="270px" Height="270px"
                           InputData="@data" InputLabels="@labels">
-                    <CustomGraphics>
-                        <text x="49%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="black" font-size="3" style="color: #21A77F;">Расход</text>
-                        <text x="49%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-size="5" style="color: #21A77F;">@data.Sum().ToString() кг</text>
-                    </CustomGraphics>
-                    </MudChart>
+                            <CustomGraphics>
+                                <text x="49%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="black" font-size="3" style="color: #21A77F;">Расход</text>
+                                <text x="49%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="black" font-size="5" style="color: #21A77F;">@data.Sum().ToString() кг</text>
+                            </CustomGraphics>
+                        </MudChart>
+                        break;
+                }
+                
             </div>
         </div>
         <div style="margin-left: 50px; margin-right: 50px;">
             @if (currentRole.Title == "Ветеринар" || currentRole.Title == "Кипер")
             {
-                <MudText Class="labelText">@GetWater()</MudText>
+                @if (currentRole.Title == "Кипер")
+                {
+                    <MudText Class="labelText">@GetWater()</MudText>
+                }
                 <MudText Class="labelText">Отчетная таблица:</MudText>
                 <MudTable Items="@aviariesList" Hover="true" Style="border: solid 1px #5FCEAD; border-radius: 5px; ">
                     <HeaderContent>
@@ -191,6 +207,7 @@
     private User currentUser = new User();
     private Aviary currentAviary = new Aviary();
     private Role currentRole = new Role();
+    private CareMaterial water = new CareMaterial();
 
     private double currentWater;
 
@@ -236,6 +253,8 @@
                 break;
             case "Кипер":
                 materialType = Context.MaterialTypes.FirstOrDefault(x => x.RoleId == Context.Roles.FirstOrDefault(x => x.Title == "Кипер").Id);
+                var water = Context.CareMaterials.FirstOrDefault(x => x.Title == "Вода");
+                currentWater = Context.MaterialApplications.FirstOrDefault(x => x.MaterialId == water.Id && x.Date == currentReport.Date).Expense;
                 //foreach (Animal item in animalsList)
                 //{
                 //    materialApplications = Context.MaterialApplications.Where(x => x.Date == currentReport.Date && x.AnimalId == item.Id &&
@@ -246,9 +265,6 @@
                 //}
                 break;
         }
-
-        var water = Context.CareMaterials.FirstOrDefault(x => x.Title == "Вода");
-        currentWater = Context.MaterialApplications.FirstOrDefault(x => x.MaterialId == water.Id && x.Date == currentReport.Date).Expense;
 
         var careMaterialList = Context.CareMaterials.Where(x => x.TypeId == materialType.Id).ToList();
 

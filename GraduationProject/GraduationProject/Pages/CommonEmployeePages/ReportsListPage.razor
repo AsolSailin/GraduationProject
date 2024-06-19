@@ -84,11 +84,12 @@
         </div>
     </MudPaper>
 }
-else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Кипер")
+else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Кипер" || Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Ветеринар")
 {
     <MudPaper Class="paper">
         <MudText Class="mainLabelText">Мои отчеты</MudText>
         <div>
+            <MudDatePicker Style="width: 25%; margin-left: auto; margin-right: auto; " Editable="true" Date="date" ImmediateText="true" Placeholder="день.месяц.год" DateFormat="@dateFormat" TextChanged="DatePickerTextChanged" Clearable="true" />
             <MudButton Variant="Variant.Outlined" Style="bottom: 30px; border-radius: 10px; height: 30px; font-size: 18px; border: 3px solid #21A77F; color: #21A77F; width: 25%; margin-top: 30px;" Class="d-flex mx-auto" OnClick="GetReportReg">Оформить отчет</MudButton>
         </div>
         <div class="mainBlock">
@@ -147,9 +148,10 @@ else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.Ro
         {
             reportsList = Context.Reports.Where(x => x.Date == date).ToList();
         }
-        else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Кипер")
+        else if (Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Кипер" || 
+        Context.Roles.FirstOrDefault(x => x.Id == CurrentElement.CurrentUser.RoleId).Title == "Ветеринар")
         {
-            wReportsList = Context.Reports.Where(x => x.UserId == CurrentElement.CurrentUser.Id).ToList();
+            wReportsList = Context.Reports.Where(x => x.UserId == CurrentElement.CurrentUser.Id && x.Date == date).ToList();
         }
     }
 
